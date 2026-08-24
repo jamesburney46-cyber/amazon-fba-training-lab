@@ -6,23 +6,23 @@
 :root {
   color-scheme: dark;
 
-  /* Surfaces */
-  --bg-canvas: #0a0e14;
-  --bg-surface: #10151d;
-  --bg-surface-raised: #161d27;
-  --bg-surface-hover: #1c2531;
-  --bg-inset: #0d1218;
+  /* Surfaces — deep navy/charcoal, closer to a premium paid-product shell */
+  --bg-canvas: #070a0f;
+  --bg-surface: #0d131b;
+  --bg-surface-raised: #131b26;
+  --bg-surface-hover: #19212d;
+  --bg-inset: #0a0e14;
 
   /* Borders */
-  --border-subtle: #1f2733;
-  --border-default: #2a3644;
-  --border-strong: #3c4b5e;
+  --border-subtle: #1c2530;
+  --border-default: #29323f;
+  --border-strong: #3c4a5c;
 
   /* Text */
-  --text-primary: #eef2f7;
-  --text-secondary: #aab6c6;
-  --text-muted: #7c8797;
-  --text-inverse: #0a0e14;
+  --text-primary: #f1f4f9;
+  --text-secondary: #aeb9c9;
+  --text-muted: #808da0;
+  --text-inverse: #070a0f;
 
   /* Brand / accent — restrained blue, not neon */
   --accent-500: #3d7cf4;
@@ -30,6 +30,15 @@
   --accent-600: #2f63cc;
   --accent-contrast: #ffffff;
   --accent-tint: rgba(61, 124, 244, 0.12);
+
+  /* Secondary accent — restrained warm gold, used sparingly alongside blue
+     for premium emphasis (eyebrows, key numerals, decision moments). Never
+     the dominant colour and never used for hype/urgency styling. */
+  --gold-500: #c9a15a;
+  --gold-400: #d8b578;
+  --gold-600: #a9803f;
+  --gold-contrast: #1a1305;
+  --gold-tint: rgba(201, 161, 90, 0.12);
 
   /* Semantic — used sparingly (status, scorecard outcomes only) */
   --status-go: #34b56a;

@@ -4,11 +4,12 @@ interface Props {
   value: string;
   hint?: string;
   tone?: "default" | "go" | "investigate" | "reject";
+  featured?: boolean;
 }
-const { label, value, hint, tone = "default" } = Astro.props;
+const { label, value, hint, tone = "default", featured = false } = Astro.props;
 ---
 
-<div class:list={["stat", `stat--${tone}`]}>
+<div class:list={["stat", `stat--${tone}`, { "stat--featured": featured }]}>
   <p class="stat__label">{label}</p>
   <p class="stat__value">{value}</p>
   {hint && <p class="stat__hint">{hint}</p>}
@@ -20,6 +21,13 @@ const { label, value, hint, tone = "default" } = Astro.props;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
+  }
+  .stat--featured {
+    border-color: color-mix(in srgb, var(--gold-500) 40%, var(--border-subtle));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold-500) 12%, transparent);
+  }
+  .stat--featured .stat__label {
+    color: var(--gold-400);
   }
   .stat__label {
     margin: 0 0 var(--space-2);

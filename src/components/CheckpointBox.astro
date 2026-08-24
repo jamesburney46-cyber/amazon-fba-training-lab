@@ -1,21 +1,28 @@
 ---
 // Watch -> Do -> Explain Back -> Checkpoint. This renders the Checkpoint
 // step: a short question that proves understanding, not passive viewing.
+import { randomUUID } from "node:crypto";
+
 interface Props {
   prompt: string;
 }
 const { prompt } = Astro.props;
+
+// A curriculum page can render several CheckpointBox instances (one per
+// lesson night), so the input id must be unique per instance — otherwise
+// duplicate ids break the label/textarea association for screen readers.
+const inputId = `checkpoint-answer-${randomUUID().slice(0, 8)}`;
 ---
 
 <div class="checkpoint">
   <p class="checkpoint__kicker">Checkpoint</p>
   <p class="checkpoint__prompt">{prompt}</p>
-  <label class="checkpoint__label" for="checkpoint-answer">
+  <label class="checkpoint__label" for={inputId}>
     Your answer (saved to your account when Supabase is connected; kept only
     in this browser tab in demo mode)
   </label>
   <textarea
-    id="checkpoint-answer"
+    id={inputId}
     class="checkpoint__input"
     rows="3"
     placeholder="Write a short, specific answer — a number, a decision, or a one-paragraph explanation."

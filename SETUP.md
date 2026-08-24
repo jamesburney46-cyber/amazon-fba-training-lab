@@ -47,6 +47,21 @@ Without a connected Supabase project:
 This is intentional: Phase 1 ships a complete, honest UI shell rather than
 a fake "logged in" experience.
 
+**What Supabase does and doesn't gate.** This is a static site (Astro's
+default static output, deployed to GitHub Pages) — every page, including
+`/dashboard/`, `/curriculum/`, `/research-machine/` and `/scorecard/`, is
+plain public HTML/JS shipped to anyone who requests the URL. There is no
+server-side route protection. The course content itself has never been
+secret and doesn't need to be: it's published training material, not
+credentials or private business data. When Supabase is connected, "signed
+in" only changes what the page *shows and saves for a given browser
+session* (real progress/checkpoints/candidates behind Postgres Row Level
+Security instead of local storage) — it is a progress-tracking and
+personalisation boundary, not an access-control boundary on the static
+markup. Anything that must stay genuinely private (real Amazon
+sales/PPC/business data) is out of scope for this product entirely — see
+the repository root `README.md`.
+
 ## 5. Known limitation in this Phase 1 commit
 
 The coding agent that authored this scaffold could not execute
