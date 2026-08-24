@@ -1,0 +1,173 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/Card.astro";
+import Callout from "@/components/Callout.astro";
+import CheckpointBox from "@/components/CheckpointBox.astro";
+import { weeks, type LessonStep, type Week } from "@/data/curriculum";
+import { url } from "@/lib/paths";
+
+export function getStaticPaths() {
+  return weeks.map((w) => ({ params: { slug: w.slug }, props: { week: w } }));
+}
+
+interface Props {
+  week: Week;
+}
+
+const { week } = Astro.props as Props;
+
+const stepLabel: Record<LessonStep["kind"], string> = {
+  watch: "Watch",
+  do: "Do",
+  explain: "Explain back",
+  checkpoint: "Checkpoint",
+};
+---
+
+<AppLayout title={`Week ${week.n} — ${week.title}`} description={week.goal}>
+  <a class="back-link" href={url("/curriculum/")}>&larr; All weeks</a>
+
+  <header class="page-head">
+    <p class="eyebrow">Week {week.n} {week.status === "planned" && "· Planned"}</p>
+    <h1>{week.title}</h1>
+    <p class="page-head__lede">{week.goal}</p>
+  </header>
+
+  {week.status === "planned" ? (
+    <Callout tone="info" title="This week is planned, not yet built">
+      <p>
+        Week {week.n} will follow the same Watch → Do → Explain Back →
+        Checkpoint structure as Weeks 1–2 once it opens. No nightly content
+        has been invented for it in this phase — check back after it's
+        built, or revisit Weeks 1–2 in the meantime.
+      </p>
+    </Callout>
+  ) : (
+    <div class="lessons">
+      {week.lessons?.map((lesson) => (
+        <Card class="lesson">
+          <div class="lesson__head">
+            <span class="lesson__night">Night {lesson.night}</span>
+            <h2>{lesson.title}</h2>
+          </div>
+          <div class="lesson__steps">
+            {lesson.steps.map((step) =>
+              step.kind === "checkpoint" && step.checkpointPrompt ? (
+                <div class="lesson__step">
+                  <p class="lesson__step-heading">{stepLabel[step.kind]}</p>
+                  <CheckpointBox prompt={step.checkpointPrompt} />
+                </div>
+              ) : (
+                <div class="lesson__step">
+                  <p class="lesson__step-heading">{step.heading}</p>
+                  <ul>
+                    {step.items.map((item) => <li>{item}</li>)}
+                  </ul>
+                </div>
+              )
+            )}
+          </div>
+        </Card>
+      ))}
+
+      {week.examPrompt && (
+        <Card class="lesson lesson--exam">
+          <div class="lesson__head">
+            <span class="lesson__night">Friday</span>
+            <h2>Week {week.n} exam</h2>
+          </div>
+          <p class="lesson__step-heading">Exam</p>
+          <p>{week.examPrompt}</p>
+          {week.passStandard && (
+            <Callout tone="success" title="Pass standard">
+              <p>{week.passStandard}</p>
+            </Callout>
+          )}
+        </Card>
+      )}
+    </div>
+  )}
+
+  <div class="week-nav">
+    {week.n > 1 && (
+      <a href={url(`/curriculum/week-${week.n - 1}/`)}>&larr; Week {week.n - 1}</a>
+    )}
+    {week.n < 12 && (
+      <a href={url(`/curriculum/week-${week.n + 1}/`)}>Week {week.n + 1} &rarr;</a>
+    )}
+  </div>
+</AppLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-6);
+  }
+  .back-link:hover {
+    color: var(--text-primary);
+  }
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin-bottom: var(--space-8);
+  }
+  .page-head__lede {
+    max-width: 62ch;
+  }
+  .lessons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .lesson__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .lesson__night {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--accent-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .lesson__head h2 {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+  .lesson__steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .lesson__step-heading {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+  .lesson--exam {
+    border-color: var(--accent-500);
+  }
+  .week-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-10);
+    font-size: var(--text-sm);
+  }
+  .week-nav a {
+    text-decoration: none;
+    color: var(--accent-400);
+    font-weight: var(--weight-medium);
+  }
+</style>

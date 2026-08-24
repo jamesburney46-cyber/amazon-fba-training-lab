@@ -1,0 +1,90 @@
+---
+interface Props {
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md";
+  class?: string;
+  disabled?: boolean;
+}
+const {
+  href,
+  type = "button",
+  variant = "primary",
+  size = "md",
+  class: className = "",
+  disabled = false,
+} = Astro.props;
+
+const classes = ["btn", `btn--${variant}`, `btn--${size}`, className].join(" ");
+const Tag = href ? "a" : "button";
+---
+
+<Tag
+  class={classes}
+  href={href}
+  type={href ? undefined : type}
+  disabled={href ? undefined : disabled}
+  aria-disabled={disabled ? "true" : undefined}
+>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition: background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      transform var(--duration-fast) var(--ease-standard);
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn--md {
+    padding: 0.7rem 1.3rem;
+    font-size: var(--text-base);
+  }
+  .btn--sm {
+    padding: 0.45rem 0.9rem;
+    font-size: var(--text-sm);
+  }
+  .btn--primary {
+    background: var(--accent-500);
+    color: var(--accent-contrast);
+  }
+  .btn--primary:hover {
+    background: var(--accent-400);
+  }
+  .btn--secondary {
+    background: var(--bg-surface-raised);
+    color: var(--text-primary);
+    border-color: var(--border-default);
+  }
+  .btn--secondary:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+  }
+  .btn--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+  }
+  .btn--ghost:hover {
+    color: var(--text-primary);
+    background: var(--bg-surface-hover);
+  }
+  .btn[aria-disabled="true"],
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+</style>

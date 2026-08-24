@@ -1,0 +1,102 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/components/Button.astro";
+import Callout from "@/components/Callout.astro";
+import { url } from "@/lib/paths";
+---
+
+<BaseLayout title="Create account" description="Create a free FBA Operator Lab account.">
+  <div class="container">
+    <div class="auth-shell">
+      <div class="auth-card animate-in">
+        <h1>Create your free account</h1>
+        <p class="auth-card__lede">
+          Track curriculum progress, save checkpoints, and keep research
+          candidates across sessions.
+        </p>
+
+        <div id="demo-notice" hidden>
+          <Callout tone="warning" title="Preview / demo mode">
+            No Supabase project is connected in this deployment, so this
+            form validates input but does not create a real account.
+            Connect Supabase (see <code>SETUP.md</code>) to enable live
+            accounts.
+          </Callout>
+        </div>
+
+        <form id="sign-up-form" novalidate>
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="form-field">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="form-field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" />
+            <p class="form-field__hint">At least 8 characters.</p>
+          </div>
+          <div class="form-field">
+            <label for="confirm">Confirm password</label>
+            <input id="confirm" name="confirm" type="password" autocomplete="new-password" required minlength="8" />
+          </div>
+          <div class="form-actions">
+            <Button type="submit">Create account</Button>
+          </div>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="auth-switch">
+          Already training? <a href={url("/auth/sign-in/")}>Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+
+  const demoNotice = document.getElementById("demo-notice");
+  if (!isSupabaseConfigured && demoNotice) demoNotice.hidden = false;
+
+  const form = document.getElementById("sign-up-form") as HTMLFormElement | null;
+  const status = document.getElementById("form-status");
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!status) return;
+
+    const password = (form.elements.namedItem("password") as HTMLInputElement)?.value ?? "";
+    const confirm = (form.elements.namedItem("confirm") as HTMLInputElement)?.value ?? "";
+
+    if (password !== confirm) {
+      status.className = "form-status is-visible is-error";
+      status.textContent = "Passwords do not match.";
+      return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      status.className = "form-status is-visible is-demo";
+      status.textContent =
+        "Demo mode: no Supabase project is configured, so no real account was created. Connect Supabase (see SETUP.md) to enable live sign-up.";
+      return;
+    }
+
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value ?? "";
+    status.className = "form-status is-visible";
+    status.textContent = "Creating account…";
+
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      status.className = "form-status is-visible is-error";
+      status.textContent = error.message;
+      return;
+    }
+    status.className = "form-status is-visible is-success";
+    status.textContent = "Account created. Check your email to confirm, then sign in.";
+  });
+</script>

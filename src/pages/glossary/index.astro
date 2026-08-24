@@ -1,0 +1,66 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { glossary } from "@/data/glossary";
+---
+
+<AppLayout title="Glossary" description="Plain-English definitions of FBA/PPC/import terms used across the programme.">
+  <header class="page-head">
+    <p class="eyebrow">Reference</p>
+    <h1>Glossary</h1>
+    <p class="page-head__lede">
+      Plain-English definitions for the terms used throughout the curriculum,
+      the Product Research Machine and the Candidate Scorecard.
+    </p>
+  </header>
+
+  <dl class="glossary-list">
+    {glossary.map((g) => (
+      <div class="glossary-item">
+        <dt>{g.term}</dt>
+        <dd>{g.definition}</dd>
+      </div>
+    ))}
+  </dl>
+</AppLayout>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin-bottom: var(--space-8);
+  }
+  .page-head__lede {
+    max-width: 62ch;
+  }
+  .glossary-list {
+    margin: 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .glossary-item {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--space-6);
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .glossary-item dt {
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+  }
+  .glossary-item dd {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+  @media (max-width: 720px) {
+    .glossary-item {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+  }
+</style>

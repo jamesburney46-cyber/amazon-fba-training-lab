@@ -1,0 +1,26 @@
+{
+  "name": "fba-operator-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "FBA Operator Lab — a premium, evidence-led Amazon FBA training and product-research platform.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "astro": "^4.16.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}

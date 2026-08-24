@@ -1,0 +1,358 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Callout from "@/components/Callout.astro";
+import { scorecardFactors, hardStopGates, totalWeight } from "@/data/scorecard";
+---
+
+<AppLayout
+  title="Candidate Scorecard"
+  description="The 100-point weighted Candidate Scorecard with hard-stop gates."
+>
+  <header class="page-head">
+    <p class="eyebrow">Practice tool</p>
+    <h1>100-point Candidate Scorecard</h1>
+    <p class="page-head__lede">
+      Score a candidate against the weighted factors below. Any triggered
+      hard-stop gate overrides the score — a high total never overrides a
+      hard-stop risk.
+    </p>
+  </header>
+
+  <Callout tone="warning" title="Demo-mode tool — no live Amazon integration">
+    Scores and saved candidates live only in this browser (local storage).
+    Nothing here reads real Amazon data. Connect Supabase and sign in to
+    persist candidates to your account — see <code>SETUP.md</code>.
+  </Callout>
+
+  <div class="scorecard" data-scorecard>
+    <section class="panel">
+      <label class="candidate-name-label" for="candidate-name">Candidate name</label>
+      <input id="candidate-name" data-candidate-name type="text" placeholder="e.g. Candidate A" />
+
+      <div class="factors">
+        {scorecardFactors.map((factor) => (
+          <div class="factor">
+            <div class="factor__head">
+              <div>
+                <p class="factor__label">{factor.label}</p>
+                <p class="factor__question">{factor.question}</p>
+              </div>
+              <span class="factor__value" data-factor-value={factor.key}>0 / {factor.weight}</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max={factor.weight}
+              step="1"
+              value="0"
+              data-factor={factor.key}
+              aria-label={`${factor.label} score, out of ${factor.weight}`}
+            />
+          </div>
+        ))}
+      </div>
+
+      <h2 class="gates-heading">Hard-stop gates</h2>
+      <p class="gates-lede">
+        Reject regardless of total score if any of these is true and cannot
+        be resolved.
+      </p>
+      <div class="gates">
+        {hardStopGates.map((gate) => (
+          <label class="gate">
+            <input type="checkbox" data-hard-stop value={gate.key} />
+            <span>{gate.label}</span>
+          </label>
+        ))}
+      </div>
+    </section>
+
+    <aside class="result-panel">
+      <div class="result-card">
+        <p class="result-card__label">Total score</p>
+        <p class="result-card__score"><span data-total-score>0</span><span class="result-card__max">/ {totalWeight}</span></p>
+        <div class="recommendation" data-recommendation>
+          <p class="recommendation__label" data-recommendation-label>—</p>
+          <p class="recommendation__reason" data-recommendation-reason></p>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button type="button" data-save>Save</button>
+        <button type="button" data-print>Print</button>
+        <button type="button" data-export>Export JSON</button>
+        <button type="button" data-reset class="ghost">Reset</button>
+      </div>
+      <p class="save-status" data-save-status role="status" aria-live="polite"></p>
+
+      <div class="saved-candidates">
+        <h3>Saved candidates</h3>
+        <div data-saved-list></div>
+      </div>
+    </aside>
+  </div>
+</AppLayout>
+
+<script>
+  import { initScorecard } from "@/scripts/scorecard";
+  const root = document.querySelector<HTMLElement>("[data-scorecard]");
+  if (root) initScorecard(root);
+</script>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head { margin-bottom: var(--space-6); }
+  .page-head__lede { max-width: 68ch; }
+
+  .scorecard {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-8);
+    margin-top: var(--space-8);
+    align-items: start;
+  }
+  .panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+  .candidate-name-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    margin-bottom: var(--space-2);
+  }
+  #candidate-name {
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    color: var(--text-primary);
+    background: var(--bg-inset);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  .factors {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-bottom: var(--space-8);
+  }
+  .factor__head {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+  .factor__label {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-sm);
+  }
+  .factor__question {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  .factor__value {
+    font-size: var(--text-sm);
+    color: var(--accent-400);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .factor input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent-500);
+  }
+
+  .gates-heading {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-2);
+  }
+  .gates-lede {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+  }
+  .gates {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .gate {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    padding: var(--space-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  .gate input {
+    margin-top: 3px;
+    accent-color: var(--status-reject);
+  }
+
+  .result-panel {
+    position: sticky;
+    top: calc(var(--nav-height) + var(--space-6));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .result-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    text-align: center;
+  }
+  .result-card__label {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+  }
+  .result-card__score {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+  }
+  .result-card__max {
+    font-size: var(--text-lg);
+    color: var(--text-muted);
+    font-weight: var(--weight-regular);
+  }
+  .recommendation {
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+  .recommendation__label {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+  .recommendation__reason {
+    margin: 0;
+    font-size: var(--text-xs);
+  }
+  .recommendation--go {
+    background: var(--status-go-tint);
+  }
+  .recommendation--go .recommendation__label { color: var(--status-go); }
+  .recommendation--investigate {
+    background: var(--status-investigate-tint);
+  }
+  .recommendation--investigate .recommendation__label { color: var(--status-investigate); }
+  .recommendation--reject {
+    background: var(--status-reject-tint);
+  }
+  .recommendation--reject .recommendation__label { color: var(--status-reject); }
+
+  .result-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+  }
+  .result-actions button {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface-raised);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .result-actions button:hover {
+    background: var(--bg-surface-hover);
+  }
+  .result-actions button.ghost {
+    background: transparent;
+    color: var(--text-muted);
+  }
+  .save-status {
+    min-height: 1.2em;
+    font-size: var(--text-xs);
+    color: var(--status-go);
+    margin: 0;
+  }
+
+  .saved-candidates {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+  .saved-candidates h3 {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+  }
+  :global(.saved-empty) {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin: 0;
+  }
+  :global(.saved-row) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  :global(.saved-row:last-child) {
+    border-bottom: none;
+  }
+  :global(.saved-row__name) {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+  :global(.saved-row__meta) {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  :global(.saved-row__actions) {
+    display: flex;
+    gap: var(--space-2);
+  }
+  :global(.saved-row__actions button) {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface-raised);
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  @media (max-width: 960px) {
+    .scorecard {
+      grid-template-columns: 1fr;
+    }
+    .result-panel {
+      position: static;
+    }
+  }
+
+  @media print {
+    header, footer, .save-status, .result-actions, .saved-candidates {
+      display: none !important;
+    }
+  }
+</style>

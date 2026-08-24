@@ -1,0 +1,394 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Card from "@/components/Card.astro";
+import Button from "@/components/Button.astro";
+import Badge from "@/components/Badge.astro";
+import Callout from "@/components/Callout.astro";
+import { url } from "@/lib/paths";
+
+const pillars = [
+  {
+    title: "Watch",
+    body: "Short, curated official and third-party video/reading — never the whole internet, just the parts that matter.",
+  },
+  {
+    title: "Do",
+    body: "A concrete practical exercise every night. Passive watching alone never counts as training completed.",
+  },
+  {
+    title: "Explain back",
+    body: "The learner writes the lesson in their own words, as if teaching someone else. This is where understanding gets tested.",
+  },
+  {
+    title: "Checkpoint",
+    body: "One number, decision, or short answer that proves the lesson landed — not a multiple-choice quiz.",
+  },
+];
+
+const weeks = [
+  { n: 1, title: "How Amazon FBA actually works", status: "live" },
+  { n: 2, title: "Product research: demand before enthusiasm", status: "live" },
+  { n: 3, title: "Competition, reviews and differentiation", status: "planned" },
+  { n: 4, title: "Unit economics and cash", status: "planned" },
+  { n: 5, title: "Suppliers, sourcing, samples and negotiation", status: "planned" },
+  { n: 6, title: "Freight, import VAT, duty and landed cost", status: "planned" },
+  { n: 7, title: "Listing and conversion", status: "planned" },
+  { n: 8, title: "PPC without wasting money", status: "planned" },
+  { n: 9, title: "Inventory and stock planning", status: "planned" },
+  { n: 10, title: "Compliance, IP and business discipline", status: "planned" },
+  { n: 11, title: "Supervised product-research apprenticeship", status: "planned" },
+  { n: 12, title: "Investment-committee simulation", status: "planned" },
+];
+
+const funnel = [
+  { stage: "A", count: "30 raw ideas", detail: "Broad discovery across marketplace browsing, research tools, review mining and demand signals." },
+  { stage: "B", count: "10 survive fast rejection", detail: "Hard-stop screen removes brand moats, fragile/oversized items, thin margin and weak demand before any real time is spent." },
+  { stage: "C", count: "5 survive the evidence screen", detail: "Keyword demand, competitor pricing, review themes, differentiation and compliance risk captured for each survivor." },
+  { stage: "D", count: "3 reach a full commercial model", detail: "Complete unit economics: contribution after PPC, break-even ACoS, MOQ cash exposure and cash-conversion cycle." },
+  { stage: "E", count: "Owner decision", detail: "A maximum of three candidates ever reach a GO / INVESTIGATE / REJECT owner decision — most ideas are rejected before anyone's time is spent on them." },
+];
+---
+
+<BaseLayout
+  title="Home"
+  description="A premium, evidence-led Amazon FBA training and product-research platform. Learn the full operating model, then practise the research machine that separates real opportunities from noise."
+>
+  <section class="hero">
+    <div class="container hero__inner">
+      <p class="eyebrow">Training + product research, not a business dashboard</p>
+      <h1>Learn Amazon FBA the way a disciplined operator actually runs it.</h1>
+      <p class="hero__lede">
+        A 12-week guided programme and a repeatable product-research machine —
+        built to teach demand-before-enthusiasm thinking, real unit economics,
+        and the discipline to reject far more ideas than you accept, before
+        any capital is ever committed.
+      </p>
+      <div class="hero__actions">
+        <Button href={url("/auth/sign-up/")} size="md">Start training</Button>
+        <Button href={url("/curriculum/")} variant="secondary" size="md">
+          Preview the curriculum
+        </Button>
+      </div>
+      <p class="hero__note">
+        Training and research only. No live Amazon account changes, no
+        supplier orders, no PPC deployment happen inside this product.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Every lesson follows the same disciplined loop</h2>
+      <p class="section__lede">
+        No passive video marathons. Each night is short, deliberate, and ends
+        with proof of understanding.
+      </p>
+      <div class="grid grid--4">
+        {pillars.map((p, i) => (
+          <Card>
+            <p class="pillar__index">{String(i + 1).padStart(2, "0")}</p>
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--muted">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>The 12-week journey</h2>
+          <p class="section__lede">
+            Weeks 1–2 are fully built and ready to use. Weeks 3–12 are
+            planned and will open on the same Watch → Do → Explain Back →
+            Checkpoint structure — they are intentionally not populated yet
+            in this release.
+          </p>
+        </div>
+        <Button href={url("/curriculum/")} variant="secondary" size="sm">
+          View full curriculum
+        </Button>
+      </div>
+      <ol class="week-grid">
+        {weeks.map((w) => (
+          <li class:list={["week-tile", { "week-tile--planned": w.status === "planned" }]}>
+            <span class="week-tile__number">Week {w.n}</span>
+            <span class="week-tile__title">{w.title}</span>
+            <span class="week-tile__status">
+              {w.status === "live" ? "Available now" : "Planned"}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>The Product Research Machine</h2>
+          <p class="section__lede">
+            The same funnel used to turn scattered product ideas into a
+            defensible shortlist — practise it directly, candidate by
+            candidate, before it ever touches real money.
+          </p>
+        </div>
+        <Button href={url("/research-machine/")} variant="secondary" size="sm">
+          Open the research machine
+        </Button>
+      </div>
+      <div class="funnel">
+        {funnel.map((f) => (
+          <div class="funnel__stage">
+            <span class="funnel__badge">{f.stage}</span>
+            <div>
+              <p class="funnel__count">{f.count}</p>
+              <p class="funnel__detail">{f.detail}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Callout tone="info" title="The machine's job is to reject, not to sell you on ideas">
+        <p>
+          A month with no acceptable product is a valid outcome if every
+          candidate that month was genuinely weak. The scorecard and hard-stop
+          gates exist to make rejection defensible, not to justify enthusiasm.
+        </p>
+      </Callout>
+    </div>
+  </section>
+
+  <section class="section section--muted">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>Evidence you can trust, clearly labelled</h2>
+          <p class="section__lede">
+            Every resource in the library is tagged by source so you always
+            know whether you're reading Amazon's own rules, UK government
+            guidance, or a third-party walkthrough.
+          </p>
+        </div>
+        <Button href={url("/resources/")} variant="secondary" size="sm">
+          Browse resource library
+        </Button>
+      </div>
+      <div class="badge-row">
+        <Badge kind="official" /> Amazon Seller University, Amazon Ads —
+        the factual backbone.
+      </div>
+      <div class="badge-row">
+        <Badge kind="govuk" /> Import, VAT, duty, EORI and IP guidance —
+        used as-is, never reinterpreted as legal advice.
+      </div>
+      <div class="badge-row">
+        <Badge kind="third-party" /> Structured walkthroughs for context —
+        never the sole source for a compliance or financial claim.
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta">
+    <div class="container cta__inner">
+      <h2>Ready to see whether an idea survives the evidence?</h2>
+      <p class="section__lede">
+        Create a free account to track your progress through the programme,
+        or preview everything first — the curriculum, resources and tools
+        are visible before you sign in.
+      </p>
+      <div class="hero__actions">
+        <Button href={url("/auth/sign-up/")}>Create free account</Button>
+        <Button href={url("/scorecard/")} variant="secondary">
+          Try the 100-point scorecard
+        </Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-4);
+  }
+  .hero {
+    padding-block: var(--space-20) var(--space-16);
+    border-bottom: 1px solid var(--border-subtle);
+    background:
+      radial-gradient(60% 60% at 20% 0%, var(--accent-tint), transparent 60%),
+      var(--bg-canvas);
+  }
+  .hero__inner {
+    max-width: 800px;
+  }
+  .hero__lede {
+    font-size: var(--text-md);
+    max-width: 60ch;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+  .hero__note {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: 0;
+  }
+
+  .section {
+    padding-block: var(--space-16);
+  }
+  .section--muted {
+    background: var(--bg-inset);
+    border-block: 1px solid var(--border-subtle);
+  }
+  .section__lede {
+    max-width: 62ch;
+    font-size: var(--text-base);
+  }
+  .section__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-8);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .grid--4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .pillar__index {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-2);
+  }
+
+  .week-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+  .week-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+  }
+  .week-tile__number {
+    font-size: var(--text-xs);
+    color: var(--accent-400);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .week-tile__title {
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+  }
+  .week-tile__status {
+    font-size: var(--text-xs);
+    color: var(--status-go);
+  }
+  .week-tile--planned {
+    opacity: 0.6;
+  }
+  .week-tile--planned .week-tile__status {
+    color: var(--text-muted);
+  }
+
+  .funnel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+  .funnel__stage {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+  }
+  .funnel__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: var(--accent-tint);
+    color: var(--accent-400);
+    font-weight: var(--weight-semibold);
+  }
+  .funnel__count {
+    margin: 0 0 var(--space-1);
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+  }
+  .funnel__detail {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .badge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+  }
+
+  .cta {
+    text-align: center;
+  }
+  .cta__inner {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .cta .hero__actions {
+    justify-content: center;
+  }
+
+  @media (max-width: 960px) {
+    .grid--4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .week-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .grid--4,
+    .week-grid {
+      grid-template-columns: 1fr;
+    }
+    .section__head {
+      flex-direction: column;
+    }
+  }
+</style>

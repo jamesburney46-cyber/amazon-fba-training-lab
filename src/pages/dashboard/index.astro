@@ -1,0 +1,161 @@
+---
+// Learner dashboard — course progress, current week, next lesson, recent
+// work. Deliberately NOT a business/sales/PPC KPI dashboard: this product
+// tracks training progress and research-practice output only.
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/Card.astro";
+import StatTile from "@/components/StatTile.astro";
+import ProgressBar from "@/components/ProgressBar.astro";
+import Button from "@/components/Button.astro";
+import Callout from "@/components/Callout.astro";
+import { weeks } from "@/data/curriculum";
+import { url } from "@/lib/paths";
+
+const currentWeek = weeks[0];
+const nextLesson = currentWeek.lessons?.[0];
+---
+
+<AppLayout title="Dashboard" description="Your FBA Operator Lab training dashboard.">
+  <div id="demo-banner" hidden>
+    <Callout tone="warning" title="Preview / demo mode">
+      No Supabase project is connected, so this dashboard shows illustrative
+      sample progress rather than a real saved account. Connect Supabase
+      (see <code>SETUP.md</code>) to track real progress.
+    </Callout>
+  </div>
+
+  <header class="page-head">
+    <p class="eyebrow">Your training</p>
+    <h1>Welcome back</h1>
+    <p class="page-head__lede">
+      Here's where your training and research practice stands. This tracks
+      your own progress through the programme — it does not show live
+      Amazon sales, profit or advertising data.
+    </p>
+  </header>
+
+  <div class="stat-row">
+    <StatTile label="Current week" value={`Week ${currentWeek.n}`} hint={currentWeek.title} />
+    <StatTile label="Lessons complete" value="0 / 5" hint="This week" />
+    <StatTile label="Checkpoints saved" value="0" hint="Demo mode: local only" />
+    <StatTile label="Research candidates" value="0" hint="In the Product Research Machine" />
+  </div>
+
+  <div class="dashboard-grid">
+    <Card>
+      <h2>Course progress</h2>
+      <ProgressBar value={0} label="Programme complete (12 weeks)" />
+      <p class="dashboard-note">
+        Overall programme progress. Weeks 3–12 are planned but not yet open,
+        so progress can only reach the Week 1–2 portion of the programme in
+        this release.
+      </p>
+      <Button href={url("/curriculum/")} variant="secondary" size="sm">
+        View curriculum
+      </Button>
+    </Card>
+
+    <Card>
+      <h2>Next lesson</h2>
+      {nextLesson && (
+        <>
+          <p class="next-lesson__meta">Week {currentWeek.n} · Night {nextLesson.night}</p>
+          <h3>{nextLesson.title}</h3>
+          <p>Follow Watch → Do → Explain Back → Checkpoint, then save your checkpoint answer.</p>
+          <Button href={url(`/curriculum/${currentWeek.slug}/`)} size="sm">
+            Start this lesson
+          </Button>
+        </>
+      )}
+    </Card>
+
+    <Card>
+      <h2>Recent work</h2>
+      <p class="empty-state">
+        No checkpoints saved yet. Complete a lesson's Checkpoint step and it
+        will appear here.
+      </p>
+      <Button href={url(`/curriculum/${currentWeek.slug}/`)} variant="secondary" size="sm">
+        Go to Week {currentWeek.n}
+      </Button>
+    </Card>
+
+    <Card>
+      <h2>Research practice</h2>
+      <p class="empty-state">
+        No candidates saved yet. Run an idea through the Product Research
+        Machine to build your first candidate card.
+      </p>
+      <Button href={url("/research-machine/")} variant="secondary" size="sm">
+        Open Research Machine
+      </Button>
+    </Card>
+  </div>
+</AppLayout>
+
+<script>
+  import { isSupabaseConfigured } from "@/lib/supabase";
+  const banner = document.getElementById("demo-banner");
+  if (!isSupabaseConfigured && banner) banner.hidden = false;
+</script>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin: var(--space-2) 0 var(--space-8);
+  }
+  .page-head__lede {
+    max-width: 62ch;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+  .dashboard-grid h2 {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-4);
+  }
+  .dashboard-note {
+    font-size: var(--text-sm);
+    margin: var(--space-3) 0 var(--space-4);
+  }
+  .next-lesson__meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-1);
+  }
+  .empty-state {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-4);
+  }
+  @media (max-width: 960px) {
+    .stat-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .stat-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,121 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/Card.astro";
+import Callout from "@/components/Callout.astro";
+import { weeks } from "@/data/curriculum";
+import { url } from "@/lib/paths";
+---
+
+<AppLayout title="Curriculum" description="The 12-week FBA Operator Lab curriculum.">
+  <header class="page-head">
+    <p class="eyebrow">12-week programme</p>
+    <h1>Curriculum</h1>
+    <p class="page-head__lede">
+      8 weeks of core training followed by 4 weeks of supervised
+      product-research apprenticeship. Each night runs Watch → Do → Explain
+      Back → Checkpoint; Friday is a practical exam, not another lecture.
+    </p>
+  </header>
+
+  <Callout tone="info" title="Phase 1 scope">
+    Weeks 1–2 are fully built below. Weeks 3–12 show their goal only —
+    nightly content opens in a later phase rather than being invented now.
+  </Callout>
+
+  <ol class="week-list">
+    {weeks.map((w) => (
+      <li>
+        <Card class="week-card" padded={false}>
+          <a class="week-card__link" href={url(`/curriculum/${w.slug}/`)}>
+            <div class="week-card__head">
+              <span class="week-card__number">Week {w.n}</span>
+              <span class:list={["week-card__status", { "week-card__status--planned": w.status === "planned" }]}>
+                {w.status === "live" ? "Available" : "Planned"}
+              </span>
+            </div>
+            <h2>{w.title}</h2>
+            <p>{w.goal}</p>
+          </a>
+        </Card>
+      </li>
+    ))}
+  </ol>
+</AppLayout>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin-bottom: var(--space-8);
+  }
+  .page-head__lede {
+    max-width: 62ch;
+  }
+  .week-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+  }
+  .week-card {
+    padding: 0;
+    overflow: hidden;
+    transition: border-color var(--duration-fast) var(--ease-standard);
+  }
+  .week-card:hover {
+    border-color: var(--border-strong);
+  }
+  .week-card__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: var(--space-5);
+  }
+  .week-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+  }
+  .week-card__number {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .week-card__status {
+    font-size: var(--text-xs);
+    color: var(--status-go);
+    font-weight: var(--weight-medium);
+  }
+  .week-card__status--planned {
+    color: var(--text-muted);
+  }
+  .week-card h2 {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-2);
+  }
+  .week-card p {
+    font-size: var(--text-sm);
+    margin-bottom: 0;
+  }
+  @media (max-width: 960px) {
+    .week-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .week-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

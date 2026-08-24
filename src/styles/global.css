@@ -1,0 +1,237 @@
+@import "./tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-canvas);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  margin: 0 0 var(--space-4);
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+}
+h2 {
+  font-size: var(--text-2xl);
+}
+h3 {
+  font-size: var(--text-lg);
+}
+h4 {
+  font-size: var(--text-md);
+}
+
+p {
+  margin: 0 0 var(--space-4);
+  color: var(--text-secondary);
+}
+
+a {
+  color: inherit;
+}
+
+ul,
+ol {
+  margin: 0 0 var(--space-4);
+  padding-left: 1.25em;
+  color: var(--text-secondary);
+}
+
+/* Consistent, visible keyboard focus everywhere — accessibility requirement */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--accent-tint);
+  color: var(--text-primary);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: var(--content-narrow);
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: var(--space-4);
+  background: var(--accent-500);
+  color: var(--accent-contrast);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  z-index: 100;
+  transition: top var(--duration-fast) var(--ease-standard);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-in {
+    animation: fade-up var(--duration-normal) var(--ease-standard) both;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shared auth-form styling (sign-in / sign-up / reset) */
+.auth-shell {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-16);
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+}
+.auth-card h1 {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2);
+}
+.auth-card__lede {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-6);
+}
+.form-field {
+  margin-bottom: var(--space-4);
+}
+.form-field label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+.form-field input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+.form-field input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--accent-500);
+}
+.form-field__hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+}
+.form-actions {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.form-status {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  display: none;
+}
+.form-status.is-visible {
+  display: block;
+}
+.form-status.is-demo {
+  color: var(--status-investigate);
+  background: var(--status-investigate-tint);
+  border: 1px solid color-mix(in srgb, var(--status-investigate) 35%, transparent);
+}
+.form-status.is-error {
+  color: var(--status-reject);
+  background: var(--status-reject-tint);
+  border: 1px solid color-mix(in srgb, var(--status-reject) 35%, transparent);
+}
+.form-status.is-success {
+  color: var(--status-go);
+  background: var(--status-go-tint);
+  border: 1px solid color-mix(in srgb, var(--status-go) 35%, transparent);
+}
+.auth-switch {
+  margin-top: var(--space-6);
+  font-size: var(--text-sm);
+  text-align: center;
+  color: var(--text-muted);
+}
+.auth-switch a {
+  color: var(--accent-400);
+  text-decoration: none;
+  font-weight: var(--weight-medium);
+}

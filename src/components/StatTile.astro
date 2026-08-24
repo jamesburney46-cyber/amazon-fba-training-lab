@@ -1,0 +1,50 @@
+---
+interface Props {
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: "default" | "go" | "investigate" | "reject";
+}
+const { label, value, hint, tone = "default" } = Astro.props;
+---
+
+<div class:list={["stat", `stat--${tone}`]}>
+  <p class="stat__label">{label}</p>
+  <p class="stat__value">{value}</p>
+  {hint && <p class="stat__hint">{hint}</p>}
+</div>
+
+<style>
+  .stat {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+  .stat__label {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+  .stat__value {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .stat__hint {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  .stat--go .stat__value {
+    color: var(--status-go);
+  }
+  .stat--investigate .stat__value {
+    color: var(--status-investigate);
+  }
+  .stat--reject .stat__value {
+    color: var(--status-reject);
+  }
+</style>

@@ -1,0 +1,351 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Callout from "@/components/Callout.astro";
+import { funnelStages, researchDiscipline } from "@/data/researchMachine";
+
+const stageLabels: Record<string, string> = {
+  raw: "A · Raw ideas",
+  "fast-rejection": "B · Fast rejection",
+  evidence: "C · Evidence screen",
+  "commercial-model": "D · Commercial model",
+  "investment-case": "E · Investment case",
+};
+---
+
+<AppLayout
+  title="Product Research Machine"
+  description="Practise the 30 → 10 → 5 → 3 → owner-decision product research funnel."
+>
+  <header class="page-head">
+    <p class="eyebrow">Practice tool</p>
+    <h1>Product Research Machine</h1>
+    <p class="page-head__lede">
+      Add candidate product ideas and move them through the same funnel used
+      to turn 30 raw ideas into a maximum of three defensible candidates.
+      This is a practice board — no research tooling or live Amazon data is
+      connected; you are practising the discipline of rejection.
+    </p>
+  </header>
+
+  <Callout tone="warning" title="Demo-mode board">
+    Your board is saved only in this browser (local storage), not to an
+    account. Connect Supabase and sign in to persist candidates across
+    devices — see <code>SETUP.md</code>.
+  </Callout>
+
+  <section class="funnel-guide">
+    {funnelStages.map((stage) => (
+      <details class="funnel-guide__item">
+        <summary>{stage.title}</summary>
+        <p>{stage.description}</p>
+        <ul>
+          {stage.criteria.map((c) => <li>{c}</li>)}
+        </ul>
+      </details>
+    ))}
+  </section>
+
+  <section class="discipline">
+    <div>
+      <h2>Say this</h2>
+      <ul>
+        {researchDiscipline.preferred.map((p) => <li>{p}</li>)}
+      </ul>
+    </div>
+    <div>
+      <h2>Not this</h2>
+      <ul>
+        {researchDiscipline.avoid.map((a) => <li>{a}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="board" id="research-board" data-research-board>
+    <div class="board__toolbar">
+      <form data-add-form class="board__add">
+        <label for="add-input" class="visually-hidden">New candidate idea</label>
+        <input
+          id="add-input"
+          data-add-input
+          type="text"
+          placeholder="Add a raw product idea…"
+          maxlength="120"
+        />
+        <button type="submit">Add to Stage A</button>
+      </form>
+      <button type="button" class="board__reset" data-reset-board>
+        Clear board
+      </button>
+    </div>
+    <p class="board__error" data-add-error role="alert"></p>
+
+    <div class="board__columns">
+      {["raw", "fast-rejection", "evidence", "commercial-model", "investment-case"].map((stage) => (
+        <div class="board-column">
+          <div class="board-column__head">
+            <h3>{stageLabels[stage]}</h3>
+            <span data-stage-count={stage}>0 / 0</span>
+          </div>
+          <ul class="board-column__list" data-stage-list={stage}></ul>
+        </div>
+      ))}
+    </div>
+
+    <p class="board__rejected">
+      Rejected this session: <strong data-rejected-count>0</strong> — a high
+      rejection count is a valid, healthy outcome.
+    </p>
+  </section>
+</AppLayout>
+
+<script>
+  import { initResearchMachine } from "@/scripts/researchMachine";
+  const board = document.querySelector<HTMLElement>("[data-research-board]");
+  if (board) initResearchMachine(board);
+</script>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin-bottom: var(--space-6);
+  }
+  .page-head__lede {
+    max-width: 68ch;
+  }
+  .funnel-guide {
+    margin: var(--space-8) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .funnel-guide__item {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    padding: var(--space-4) var(--space-5);
+  }
+  .funnel-guide__item summary {
+    cursor: pointer;
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+  }
+  .funnel-guide__item p {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+  .funnel-guide__item ul {
+    font-size: var(--text-sm);
+  }
+
+  .discipline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+  }
+  .discipline h2 {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-3);
+  }
+  .discipline ul {
+    font-size: var(--text-sm);
+  }
+
+  .board {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-inset);
+    padding: var(--space-6);
+  }
+  .board__toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2);
+  }
+  .board__add {
+    display: flex;
+    gap: var(--space-3);
+    flex: 1;
+    min-width: 260px;
+  }
+  .board__add input {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+  }
+  .board__add button {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: var(--accent-500);
+    color: var(--accent-contrast);
+    cursor: pointer;
+  }
+  .board__reset {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+  }
+  .board__reset:hover {
+    color: var(--text-primary);
+  }
+  .board__error {
+    color: var(--status-reject);
+    font-size: var(--text-sm);
+    min-height: 1.2em;
+    margin: var(--space-2) 0 var(--space-4);
+  }
+
+  .board__columns {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+  }
+  .board-column {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    min-height: 180px;
+  }
+  .board-column__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-3);
+  }
+  .board-column__head h3 {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  .board-column__head span {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .board-column__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  :global(.board-empty) {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    padding: var(--space-3);
+    text-align: center;
+    border: 1px dashed var(--border-subtle);
+    border-radius: var(--radius-sm);
+  }
+  :global(.board-card) {
+    background: var(--bg-surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+  }
+  :global(.board-card__name) {
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+    word-break: break-word;
+  }
+  :global(.board-card__actions) {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+  :global(.board-card__btn) {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  :global(.board-card__btn:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  :global(.board-card__btn--advance:hover:not(:disabled)) {
+    border-color: var(--status-go);
+    color: var(--status-go);
+  }
+  :global(.board-card__btn--reject:hover) {
+    border-color: var(--status-reject);
+    color: var(--status-reject);
+  }
+  :global(.board-card__rec) {
+    margin-top: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  :global(.board-card__rec label) {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  :global(.board-card__rec select) {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+  }
+  :global(.board-card__score-link) {
+    display: inline-block;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--accent-400);
+    text-decoration: none;
+  }
+  .board__rejected {
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 1100px) {
+    .board__columns {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .discipline {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .board__columns {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

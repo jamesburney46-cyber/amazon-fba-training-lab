@@ -1,0 +1,126 @@
+-- FBA Operator Lab — Supabase schema + Row Level Security (RLS)
+-- Phase 1 shell: enough structure for learner progress tracking once a
+-- real Supabase project is connected. Run this in the Supabase SQL editor
+-- (or via `supabase db push` if you adopt the Supabase CLI later).
+--
+-- No data in this file is real. No service_role key is used anywhere in
+-- the app — all client access goes through the anon key + RLS below.
+
+-- ---------------------------------------------------------------------
+-- profiles: one row per authenticated learner, created on first sign-in
+-- ---------------------------------------------------------------------
+create table if not exists public.profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  display_name text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.profiles enable row level security;
+
+create policy "profiles: select own row"
+  on public.profiles for select
+  using (auth.uid() = id);
+
+create policy "profiles: insert own row"
+  on public.profiles for insert
+  with check (auth.uid() = id);
+
+create policy "profiles: update own row"
+  on public.profiles for update
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+-- ---------------------------------------------------------------------
+-- lesson_progress: one row per learner per lesson (week + night)
+-- ---------------------------------------------------------------------
+create table if not exists public.lesson_progress (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  week_slug text not null,
+  lesson_slug text not null,
+  status text not null default 'not_started'
+    check (status in ('not_started', 'in_progress', 'complete')),
+  checkpoint_answer text,
+  updated_at timestamptz not null default now(),
+  unique (user_id, week_slug, lesson_slug)
+);
+
+alter table public.lesson_progress enable row level security;
+
+create policy "lesson_progress: select own rows"
+  on public.lesson_progress for select
+  using (auth.uid() = user_id);
+
+create policy "lesson_progress: insert own rows"
+  on public.lesson_progress for insert
+  with check (auth.uid() = user_id);
+
+create policy "lesson_progress: update own rows"
+  on public.lesson_progress for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "lesson_progress: delete own rows"
+  on public.lesson_progress for delete
+  using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------
+-- research_candidates: saved Product Research Machine / Scorecard entries
+-- ---------------------------------------------------------------------
+create table if not exists public.research_candidates (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  candidate_name text not null,
+  stage text not null default 'raw'
+    check (stage in ('raw', 'investigating', 'shortlist', 'rejected')),
+  scorecard jsonb not null default '{}'::jsonb,
+  total_score integer,
+  hard_stop_triggered boolean not null default false,
+  recommendation text
+    check (recommendation in ('GO', 'INVESTIGATE', 'REJECT') or recommendation is null),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.research_candidates enable row level security;
+
+create policy "research_candidates: select own rows"
+  on public.research_candidates for select
+  using (auth.uid() = user_id);
+
+create policy "research_candidates: insert own rows"
+  on public.research_candidates for insert
+  with check (auth.uid() = user_id);
+
+create policy "research_candidates: update own rows"
+  on public.research_candidates for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "research_candidates: delete own rows"
+  on public.research_candidates for delete
+  using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------
+-- updated_at maintenance trigger
+-- ---------------------------------------------------------------------
+create or replace function public.set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists set_updated_at on public.profiles;
+create trigger set_updated_at before update on public.profiles
+  for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at on public.lesson_progress;
+create trigger set_updated_at before update on public.lesson_progress
+  for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at on public.research_candidates;
+create trigger set_updated_at before update on public.research_candidates
+  for each row execute function public.set_updated_at();

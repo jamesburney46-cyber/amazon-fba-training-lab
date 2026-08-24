@@ -1,0 +1,106 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/Card.astro";
+import Button from "@/components/Button.astro";
+import Callout from "@/components/Callout.astro";
+import { url } from "@/lib/paths";
+---
+
+<AppLayout title="Account" description="Your FBA Operator Lab account.">
+  <header class="page-head">
+    <p class="eyebrow">Account</p>
+    <h1>Account settings</h1>
+    <p class="page-head__lede">
+      Manage your profile and connection status. This page is scaffolding
+      for Phase 1 — full profile editing arrives once Supabase auth is
+      connected end-to-end.
+    </p>
+  </header>
+
+  <div id="demo-banner" hidden>
+    <Callout tone="warning" title="Preview / demo mode">
+      No Supabase project is connected, so there is no real signed-in
+      session to display. Connect Supabase (see <code>SETUP.md</code>) to
+      enable live accounts, then this page will show your real profile.
+    </Callout>
+  </div>
+
+  <div class="account-grid">
+    <Card>
+      <h2>Profile</h2>
+      <dl class="kv">
+        <div><dt>Display name</dt><dd id="acct-name">—</dd></div>
+        <div><dt>Email</dt><dd id="acct-email">—</dd></div>
+        <div><dt>Session mode</dt><dd id="acct-mode">Demo (no Supabase project connected)</dd></div>
+      </dl>
+    </Card>
+
+    <Card>
+      <h2>Data &amp; privacy</h2>
+      <p>
+        Course progress, checkpoints and saved research candidates are
+        stored per-account behind Row Level Security once Supabase is
+        connected — no learner can read another learner's data, and this
+        product never stores or displays live Amazon business data.
+      </p>
+      <Button href={url("/auth/sign-in/")} variant="secondary" size="sm">
+        Manage sign-in
+      </Button>
+    </Card>
+  </div>
+</AppLayout>
+
+<script>
+  import { isSupabaseConfigured } from "@/lib/supabase";
+  const banner = document.getElementById("demo-banner");
+  if (!isSupabaseConfigured && banner) banner.hidden = false;
+</script>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin-bottom: var(--space-6);
+  }
+  .page-head__lede {
+    max-width: 62ch;
+  }
+  .account-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+  .kv {
+    margin: 0;
+  }
+  .kv div {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: var(--text-sm);
+  }
+  .kv div:last-child {
+    border-bottom: none;
+  }
+  .kv dt {
+    color: var(--text-muted);
+  }
+  .kv dd {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+  }
+  @media (max-width: 720px) {
+    .account-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

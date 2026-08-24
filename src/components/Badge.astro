@@ -1,0 +1,50 @@
+---
+// Evidence-source badge: Official Amazon / GOV.UK / Third-party.
+// Used throughout the resource library so learners always know how much
+// weight to put on a source before treating it as fact.
+interface Props {
+  kind: "official" | "govuk" | "third-party";
+  class?: string;
+}
+const { kind, class: className = "" } = Astro.props;
+
+const labels: Record<Props["kind"], string> = {
+  official: "Official Amazon",
+  govuk: "GOV.UK",
+  "third-party": "Third-party",
+};
+---
+
+<span class:list={["badge", `badge--${kind}`, className]}>
+  {labels[kind]}
+</span>
+
+<style>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .badge--official {
+    color: var(--badge-official);
+    background: var(--badge-official-tint);
+    border-color: color-mix(in srgb, var(--badge-official) 35%, transparent);
+  }
+  .badge--govuk {
+    color: var(--badge-govuk);
+    background: var(--badge-govuk-tint);
+    border-color: color-mix(in srgb, var(--badge-govuk) 35%, transparent);
+  }
+  .badge--third-party {
+    color: var(--badge-third-party);
+    background: var(--badge-third-party-tint);
+    border-color: color-mix(in srgb, var(--badge-third-party) 35%, transparent);
+  }
+</style>

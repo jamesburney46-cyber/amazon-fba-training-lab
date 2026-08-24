@@ -1,0 +1,119 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/Card.astro";
+import Badge from "@/components/Badge.astro";
+import { resources, type ResourceCategory } from "@/data/resources";
+
+const categories = Array.from(new Set(resources.map((r) => r.category))) as ResourceCategory[];
+---
+
+<AppLayout title="Resource library" description="Curated, source-labelled FBA training resources.">
+  <header class="page-head">
+    <p class="eyebrow">Resource library</p>
+    <h1>Curated evidence, clearly labelled</h1>
+    <p class="page-head__lede">
+      Every resource is tagged by source. Official Amazon material is the
+      factual backbone; GOV.UK references cover import, tax and IP; third-party
+      resources add practical walkthroughs but never override the first two.
+    </p>
+  </header>
+
+  <div class="legend">
+    <span><Badge kind="official" /> Amazon's own rules and process.</span>
+    <span><Badge kind="govuk" /> UK government guidance.</span>
+    <span><Badge kind="third-party" /> Practical context — verify against official sources.</span>
+  </div>
+
+  {categories.map((category) => (
+    <section class="category">
+      <h2>{category}</h2>
+      <div class="resource-grid">
+        {resources
+          .filter((r) => r.category === category)
+          .map((r) => (
+            <Card class="resource-card">
+              <div class="resource-card__head">
+                <Badge kind={r.source} />
+              </div>
+              <h3>
+                <a href={r.href} target="_blank" rel="noopener noreferrer">
+                  {r.title}
+                </a>
+              </h3>
+              <p>{r.note}</p>
+            </Card>
+          ))}
+      </div>
+    </section>
+  ))}
+</AppLayout>
+
+<style>
+  .eyebrow {
+    color: var(--accent-400);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+  .page-head {
+    margin-bottom: var(--space-6);
+  }
+  .page-head__lede {
+    max-width: 62ch;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-10);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .category {
+    margin-bottom: var(--space-10);
+  }
+  .category h2 {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-4);
+  }
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+  .resource-card__head {
+    margin-bottom: var(--space-3);
+  }
+  .resource-card h3 {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-2);
+  }
+  .resource-card h3 a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .resource-card h3 a:hover {
+    color: var(--accent-400);
+  }
+  .resource-card p {
+    font-size: var(--text-sm);
+    margin-bottom: 0;
+  }
+  @media (max-width: 960px) {
+    .resource-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .resource-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

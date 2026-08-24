@@ -1,0 +1,112 @@
+---
+// Watch -> Do -> Explain Back -> Checkpoint. This renders the Checkpoint
+// step: a short question that proves understanding, not passive viewing.
+interface Props {
+  prompt: string;
+}
+const { prompt } = Astro.props;
+---
+
+<div class="checkpoint">
+  <p class="checkpoint__kicker">Checkpoint</p>
+  <p class="checkpoint__prompt">{prompt}</p>
+  <label class="checkpoint__label" for="checkpoint-answer">
+    Your answer (saved to your account when Supabase is connected; kept only
+    in this browser tab in demo mode)
+  </label>
+  <textarea
+    id="checkpoint-answer"
+    class="checkpoint__input"
+    rows="3"
+    placeholder="Write a short, specific answer — a number, a decision, or a one-paragraph explanation."
+  ></textarea>
+  <button class="checkpoint__save" type="button" data-checkpoint-save>
+    Save checkpoint
+  </button>
+  <p class="checkpoint__status" data-checkpoint-status aria-live="polite"></p>
+</div>
+
+<style>
+  .checkpoint {
+    border: 1px solid var(--border-default);
+    border-left: 3px solid var(--accent-500);
+    border-radius: var(--radius-md);
+    background: var(--bg-inset);
+    padding: var(--space-5);
+  }
+  .checkpoint__kicker {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-400);
+    font-weight: var(--weight-semibold);
+  }
+  .checkpoint__prompt {
+    margin: 0 0 var(--space-4);
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+  }
+  .checkpoint__label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+  }
+  .checkpoint__input {
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    resize: vertical;
+    margin-bottom: var(--space-3);
+  }
+  .checkpoint__input:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .checkpoint__save {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+    background: var(--bg-surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+  }
+  .checkpoint__save:hover {
+    background: var(--bg-surface-hover);
+  }
+  .checkpoint__status {
+    display: inline-block;
+    margin: var(--space-2) 0 0 var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--status-go);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-checkpoint-save]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const box = btn.closest(".checkpoint");
+      const status = box?.querySelector<HTMLElement>("[data-checkpoint-status]");
+      const textarea = box?.querySelector<HTMLTextAreaElement>("textarea");
+      if (!status || !textarea) return;
+      if (!textarea.value.trim()) {
+        status.textContent = "Write an answer before saving.";
+        status.style.color = "var(--status-investigate)";
+        return;
+      }
+      // Demo-mode local save only. A connected Supabase project would
+      // upsert this into lesson_progress instead — see src/lib/supabase.ts.
+      status.textContent = "Saved locally (demo mode).";
+      status.style.color = "var(--status-go)";
+    });
+  });
+</script>
