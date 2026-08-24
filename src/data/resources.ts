@@ -44,6 +44,13 @@ export const resources: Resource[] = [
     note: "Used in the stock-planning module.",
   },
   {
+    title: "Jungle Scout — complete Amazon FBA beginner course",
+    href: "https://www.youtube.com/watch?v=Yx1eLoNdfmc",
+    source: "third-party",
+    category: "FBA fundamentals",
+    note: "Week 1, Nights 1 and 3 — FBA-model overview, then the fees/profitability sections.",
+  },
+  {
     title: "Amazon FBA training-video collection",
     href: "https://sell.amazon.com/blog/amazon-fba-training-videos?lang=en-US",
     source: "official",
@@ -84,6 +91,13 @@ export const resources: Resource[] = [
     source: "third-party",
     category: "Product research",
     note: "Companion checklist used in the Week 2 rejection exercise.",
+  },
+  {
+    title: "Helium 10 — product research tutorial (Black Box / Cerebro / Xray)",
+    href: "https://www.youtube.com/watch?v=kp0QZsz-RtQ",
+    source: "third-party",
+    category: "Product research",
+    note: "Week 2, Night 3 core video — current walkthrough of the research tools.",
   },
   {
     title: "Import goods into the UK — step by step",

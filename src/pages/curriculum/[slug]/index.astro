@@ -3,7 +3,9 @@ import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/Card.astro";
 import Callout from "@/components/Callout.astro";
 import CheckpointBox from "@/components/CheckpointBox.astro";
+import VideoEmbed from "@/components/VideoEmbed.astro";
 import { weeks, type LessonStep, type Week } from "@/data/curriculum";
+import { getLessonVideos } from "@/data/videos";
 import { url } from "@/lib/paths";
 
 export function getStaticPaths() {
@@ -63,6 +65,15 @@ const stepLabel: Record<LessonStep["kind"], string> = {
                   <ul>
                     {step.items.map((item) => <li>{item}</li>)}
                   </ul>
+                  {step.kind === "watch" &&
+                    getLessonVideos(week.n, lesson.night).map((video) => (
+                      <VideoEmbed
+                        youtubeId={video.youtubeId}
+                        title={video.title}
+                        source={video.source}
+                        note={video.note}
+                      />
+                    ))}
                 </div>
               )
             )}

@@ -1,0 +1,94 @@
+---
+// Reusable responsive YouTube embed.
+//
+// - Uses the privacy-enhanced youtube-nocookie.com domain.
+// - Lazy-loads the iframe.
+// - Always carries a descriptive title (for the iframe a11y title and the
+//   caption), a source badge, and an external fallback link so learners
+//   can open the video directly on YouTube if the embed fails to load.
+import Badge from "@/components/Badge.astro";
+
+interface Props {
+  youtubeId: string;
+  title: string;
+  source: "official" | "govuk" | "third-party";
+  note?: string;
+}
+
+const { youtubeId, title, source, note } = Astro.props;
+const embedSrc = `https://www.youtube-nocookie.com/embed/${youtubeId}`;
+const watchHref = `https://www.youtube.com/watch?v=${youtubeId}`;
+---
+
+<figure class="video-embed">
+  <div class="video-embed__frame">
+    <iframe
+      src={embedSrc}
+      title={title}
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
+  <figcaption class="video-embed__meta">
+    <Badge kind={source} />
+    <span class="video-embed__title">{title}</span>
+    {note && <span class="video-embed__note">{note}</span>}
+    <a
+      class="video-embed__fallback"
+      href={watchHref}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Watch on YouTube &rarr;
+    </a>
+  </figcaption>
+</figure>
+
+<style>
+  .video-embed {
+    margin: var(--space-3) 0 var(--space-4);
+  }
+  .video-embed__frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-subtle);
+  }
+  .video-embed__frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .video-embed__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+  .video-embed__title {
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+  }
+  .video-embed__note {
+    color: var(--text-muted);
+    flex-basis: 100%;
+  }
+  .video-embed__fallback {
+    color: var(--accent-400);
+    text-decoration: none;
+    font-weight: var(--weight-medium);
+  }
+  .video-embed__fallback:hover {
+    text-decoration: underline;
+  }
+</style>
