@@ -56,3 +56,9 @@ not been run in this environment. The GitHub Actions workflow performs the
 real install + build on every push — check the **Actions** tab for the
 authoritative result, and run `npm install && npm run build` locally as a
 first verification step.
+
+There is also no `package-lock.json` committed yet, for the same reason —
+the workflow runs `npm install` (not `npm ci`) until a real lockfile
+exists. Running `npm install` locally once will generate
+`package-lock.json`; commit it afterwards and switch the workflow step
+back to `npm ci` for reproducible installs.
