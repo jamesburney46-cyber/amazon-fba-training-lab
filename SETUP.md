@@ -27,9 +27,11 @@ one-click repository setting, not a code problem.
 ## 3. Connect Supabase (optional — demo mode works without this)
 
 See [`supabase/README.md`](./supabase/README.md) for the full walkthrough:
-create a free Supabase project, run `supabase/schema.sql`, then copy
-`.env.example` to `.env` and fill in the two `PUBLIC_*` values. Never commit
-`.env` or a `service_role` key.
+create a free Supabase project, run `supabase/schema.sql`, configure the
+Auth redirect URLs, then copy `.env.example` to `.env` and fill in the two
+`PUBLIC_*` values for local dev (the deployed site reads the same two
+values from GitHub Actions repository variables/secrets instead — see
+`supabase/README.md`). Never commit `.env` or a `service_role` key.
 
 ## 4. What "demo mode" means
 
@@ -64,16 +66,17 @@ the repository root `README.md`.
 
 ## 5. Known limitation in this Phase 1 commit
 
-The coding agent that authored this scaffold could not execute
-`npm`/`npx` locally (blocked by its own sandboxed execution-environment
-permissions), so `npm install` / `npm run build` / `npm run check` have
-not been run in this environment. The GitHub Actions workflow performs the
-real install + build on every push — check the **Actions** tab for the
-authoritative result, and run `npm install && npm run build` locally as a
-first verification step.
+The coding agent that authored the auth wiring (relay 20260825-006) could
+not execute `npm`/`node <script>` locally (blocked by its own sandboxed
+execution-environment permissions — only inert commands like `node -v`
+were permitted), so `npm run build` / `npm run check` were not run in that
+session. The GitHub Actions workflow performs the real install + build on
+every push — check the **Actions** tab for the authoritative result, and
+run `npm install && npm run build && npm run check` locally as a first
+verification step before relying on this in production.
 
-There is also no `package-lock.json` committed yet, for the same reason —
-the workflow runs `npm install` (not `npm ci`) until a real lockfile
-exists. Running `npm install` locally once will generate
-`package-lock.json`; commit it afterwards and switch the workflow step
-back to `npm ci` for reproducible installs.
+There is also no `package-lock.json` committed yet — the workflow runs
+`npm install` (not `npm ci`) until a real lockfile exists. Running
+`npm install` locally once will generate `package-lock.json`; commit it
+afterwards and switch the workflow step back to `npm ci` for reproducible
+installs.

@@ -31,6 +31,33 @@ create policy "profiles: update own row"
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
+-- Auto-create a profile row for every new auth user, reading the display
+-- name from the sign-up metadata captured by `signUpWithPassword` in
+-- src/lib/supabase.ts (`options.data.full_name`). Runs as the function
+-- owner (security definer) so it can insert into `public.profiles` despite
+-- RLS, but it only ever inserts the row matching the just-created
+-- `auth.users` id — it is not a general-purpose bypass. RLS above still
+-- governs every other read/write, including the learner's own later
+-- updates to `display_name`.
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, display_name)
+  values (new.id, new.raw_user_meta_data ->> 'full_name')
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
 -- ---------------------------------------------------------------------
 -- lesson_progress: one row per learner per lesson (week + night)
 -- ---------------------------------------------------------------------

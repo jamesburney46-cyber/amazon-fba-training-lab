@@ -34,10 +34,15 @@ import { url } from "@/lib/paths";
             <input id="password" name="password" type="password" autocomplete="current-password" required minlength="8" />
           </div>
           <div class="form-actions">
-            <Button type="submit">Sign in</Button>
+            <Button type="submit" id="sign-in-submit">Sign in</Button>
             <a class="auth-switch" href={url("/auth/reset-password/")}>Forgot your password?</a>
           </div>
           <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          <p class="form-status" id="resend-status" role="status" aria-live="polite" hidden>
+            <button type="button" class="link-button" id="resend-confirmation">
+              Resend confirmation email
+            </button>
+          </p>
         </form>
 
         <p class="auth-switch">
@@ -49,13 +54,17 @@ import { url } from "@/lib/paths";
 </BaseLayout>
 
 <script>
-  import { demoAwareSignIn, isSupabaseConfigured } from "@/lib/supabase";
+  import { signInWithPassword, resendConfirmationEmail, isSupabaseConfigured } from "@/lib/supabase";
+  import { url } from "@/lib/paths";
 
   const demoNotice = document.getElementById("demo-notice");
   if (!isSupabaseConfigured && demoNotice) demoNotice.hidden = false;
 
   const form = document.getElementById("sign-in-form") as HTMLFormElement | null;
   const status = document.getElementById("form-status");
+  const submitBtn = document.getElementById("sign-in-submit") as HTMLButtonElement | null;
+  const resendStatus = document.getElementById("resend-status");
+  const resendBtn = document.getElementById("resend-confirmation");
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -64,14 +73,42 @@ import { url } from "@/lib/paths";
     const email = (form.elements.namedItem("email") as HTMLInputElement)?.value ?? "";
     const password = (form.elements.namedItem("password") as HTMLInputElement)?.value ?? "";
 
+    if (resendStatus) {
+      resendStatus.hidden = true;
+      resendStatus.classList.remove("is-visible");
+    }
     status.className = "form-status is-visible";
     status.textContent = "Checking…";
+    if (submitBtn) submitBtn.setAttribute("aria-disabled", "true");
 
-    const result = await demoAwareSignIn(email, password);
+    const result = await signInWithPassword(email, password);
 
     status.textContent = result.message;
     status.className = `form-status is-visible ${
       result.mode === "demo" ? "is-demo" : result.ok ? "is-success" : "is-error"
     }`;
+    if (submitBtn) submitBtn.removeAttribute("aria-disabled");
+
+    if (result.ok && result.mode === "live") {
+      window.location.href = url("/dashboard/");
+      return;
+    }
+
+    // Unconfirmed-email sign-in attempts get a clear, actionable follow-up.
+    if (!result.ok && result.mode === "live" && /confirm/i.test(result.message) && resendStatus) {
+      resendStatus.hidden = false;
+      resendStatus.classList.add("is-visible");
+      resendBtn?.setAttribute("data-email", email);
+    }
+  });
+
+  resendBtn?.addEventListener("click", async () => {
+    const email = resendBtn.getAttribute("data-email") ?? "";
+    if (!email || !status) return;
+    status.className = "form-status is-visible";
+    status.textContent = "Resending…";
+    const result = await resendConfirmationEmail(email);
+    status.textContent = result.message;
+    status.className = `form-status is-visible ${result.ok ? "is-success" : "is-error"}`;
   });
 </script>

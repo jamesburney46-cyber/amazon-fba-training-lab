@@ -30,6 +30,14 @@ jobs:
         run: npm install
 
       - name: Build
+        env:
+          # Public Supabase project values only — never a service_role key.
+          # Set these as repository/environment Variables or Secrets in
+          # Settings → Secrets and variables → Actions (see SETUP.md /
+          # supabase/README.md). Left unset, the build ships in honest demo
+          # mode — no error, no fabricated credentials.
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
         run: npm run build
 
       - name: Configure Pages

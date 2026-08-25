@@ -10,10 +10,8 @@ import { url } from "@/lib/paths";
   <header class="page-head">
     <p class="eyebrow">Account</p>
     <h1>Account settings</h1>
-    <p class="page-head__lede">
-      Manage your profile and connection status. This page is scaffolding
-      for Phase 1 — full profile editing arrives once Supabase auth is
-      connected end-to-end.
+    <p class="page-head__lede" id="account-lede">
+      Manage your profile and connection status.
     </p>
   </header>
 
@@ -25,35 +23,90 @@ import { url } from "@/lib/paths";
     </Callout>
   </div>
 
-  <div class="account-grid">
+  <div id="signed-out-state" hidden>
+    <Card>
+      <h2>You're not signed in</h2>
+      <p>Sign in to see your account details, or create a free account to start tracking progress.</p>
+      <div class="signed-out-actions">
+        <Button href={url("/auth/sign-in/")} size="sm">Sign in</Button>
+        <Button href={url("/auth/sign-up/")} variant="secondary" size="sm">Create account</Button>
+      </div>
+    </Card>
+  </div>
+
+  <div class="account-grid" id="signed-in-state" hidden>
     <Card>
       <h2>Profile</h2>
       <dl class="kv">
         <div><dt>Display name</dt><dd id="acct-name">—</dd></div>
         <div><dt>Email</dt><dd id="acct-email">—</dd></div>
-        <div><dt>Session mode</dt><dd id="acct-mode">Demo (no Supabase project connected)</dd></div>
+        <div><dt>Session mode</dt><dd id="acct-mode">Live (Supabase)</dd></div>
       </dl>
+      <Button type="button" id="sign-out-btn" variant="secondary" size="sm">Sign out</Button>
+      <p class="form-status" id="sign-out-status" role="status" aria-live="polite"></p>
     </Card>
 
     <Card>
       <h2>Data &amp; privacy</h2>
       <p>
         Course progress, checkpoints and saved research candidates are
-        stored per-account behind Row Level Security once Supabase is
-        connected — no learner can read another learner's data, and this
-        product never stores or displays live Amazon business data.
+        stored per-account behind Row Level Security — no learner can read
+        another learner's data, and this product never stores or displays
+        live Amazon business data.
       </p>
-      <Button href={url("/auth/sign-in/")} variant="secondary" size="sm">
-        Manage sign-in
-      </Button>
     </Card>
   </div>
 </AppLayout>
 
 <script>
-  import { isSupabaseConfigured } from "@/lib/supabase";
-  const banner = document.getElementById("demo-banner");
-  if (!isSupabaseConfigured && banner) banner.hidden = false;
+  import { getSupabaseClient, isSupabaseConfigured, signOut } from "@/lib/supabase";
+  import { url } from "@/lib/paths";
+
+  const demoBanner = document.getElementById("demo-banner");
+  const lede = document.getElementById("account-lede");
+  const signedOutState = document.getElementById("signed-out-state");
+  const signedInState = document.getElementById("signed-in-state");
+  const nameEl = document.getElementById("acct-name");
+  const emailEl = document.getElementById("acct-email");
+  const signOutBtn = document.getElementById("sign-out-btn");
+  const signOutStatus = document.getElementById("sign-out-status");
+
+  if (!isSupabaseConfigured) {
+    if (demoBanner) demoBanner.hidden = false;
+    if (lede) {
+      lede.textContent =
+        "This page is scaffolding for Phase 1 — connect Supabase to see and manage a real account here.";
+    }
+    if (signedOutState) signedOutState.hidden = false;
+  } else {
+    const supabase = getSupabaseClient();
+
+    const render = (session: import("@supabase/supabase-js").Session | null) => {
+      if (session?.user) {
+        if (signedInState) signedInState.hidden = false;
+        if (signedOutState) signedOutState.hidden = true;
+        if (nameEl) {
+          nameEl.textContent = (session.user.user_metadata?.full_name as string) || "—";
+        }
+        if (emailEl) emailEl.textContent = session.user.email ?? "—";
+      } else {
+        if (signedInState) signedInState.hidden = true;
+        if (signedOutState) signedOutState.hidden = false;
+      }
+    };
+
+    supabase?.auth.getSession().then(({ data }) => render(data.session));
+    supabase?.auth.onAuthStateChange((_event, session) => render(session));
+
+    signOutBtn?.addEventListener("click", async () => {
+      if (signOutStatus) {
+        signOutStatus.className = "form-status is-visible";
+        signOutStatus.textContent = "Signing out…";
+      }
+      await signOut();
+      window.location.href = url("/");
+    });
+  }
 </script>
 
 <style>
@@ -71,6 +124,11 @@ import { url } from "@/lib/paths";
   .page-head__lede {
     max-width: 62ch;
   }
+  .signed-out-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
   .account-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -78,7 +136,7 @@ import { url } from "@/lib/paths";
     margin-top: var(--space-6);
   }
   .kv {
-    margin: 0;
+    margin: 0 0 var(--space-4);
   }
   .kv div {
     display: flex;

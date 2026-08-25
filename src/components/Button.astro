@@ -6,6 +6,7 @@ interface Props {
   size?: "sm" | "md";
   class?: string;
   disabled?: boolean;
+  id?: string;
 }
 const {
   href,
@@ -14,6 +15,7 @@ const {
   size = "md",
   class: className = "",
   disabled = false,
+  ...rest
 } = Astro.props;
 
 const classes = ["btn", `btn--${variant}`, `btn--${size}`, className].join(" ");
@@ -21,6 +23,7 @@ const Tag = href ? "a" : "button";
 ---
 
 <Tag
+  {...rest}
   class={classes}
   href={href}
   type={href ? undefined : type}

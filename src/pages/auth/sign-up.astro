@@ -43,7 +43,7 @@ import { url } from "@/lib/paths";
             <input id="confirm" name="confirm" type="password" autocomplete="new-password" required minlength="8" />
           </div>
           <div class="form-actions">
-            <Button type="submit">Create account</Button>
+            <Button type="submit" id="sign-up-submit">Create account</Button>
           </div>
           <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
         </form>
@@ -57,18 +57,22 @@ import { url } from "@/lib/paths";
 </BaseLayout>
 
 <script>
-  import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+  import { signUpWithPassword, isSupabaseConfigured } from "@/lib/supabase";
+  import { url } from "@/lib/paths";
 
   const demoNotice = document.getElementById("demo-notice");
   if (!isSupabaseConfigured && demoNotice) demoNotice.hidden = false;
 
   const form = document.getElementById("sign-up-form") as HTMLFormElement | null;
   const status = document.getElementById("form-status");
+  const submitBtn = document.getElementById("sign-up-submit") as HTMLButtonElement | null;
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!status) return;
 
+    const name = (form.elements.namedItem("name") as HTMLInputElement)?.value ?? "";
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value ?? "";
     const password = (form.elements.namedItem("password") as HTMLInputElement)?.value ?? "";
     const confirm = (form.elements.namedItem("confirm") as HTMLInputElement)?.value ?? "";
 
@@ -78,25 +82,22 @@ import { url } from "@/lib/paths";
       return;
     }
 
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-      status.className = "form-status is-visible is-demo";
-      status.textContent =
-        "Demo mode: no Supabase project is configured, so no real account was created. Connect Supabase (see SETUP.md) to enable live sign-up.";
-      return;
-    }
-
-    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value ?? "";
     status.className = "form-status is-visible";
     status.textContent = "Creating account…";
+    if (submitBtn) submitBtn.setAttribute("aria-disabled", "true");
 
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      status.className = "form-status is-visible is-error";
-      status.textContent = error.message;
-      return;
+    const result = await signUpWithPassword(name, email, password);
+
+    status.textContent = result.message;
+    status.className = `form-status is-visible ${
+      result.mode === "demo" ? "is-demo" : result.ok ? "is-success" : "is-error"
+    }`;
+    if (submitBtn) submitBtn.removeAttribute("aria-disabled");
+
+    // Confirm-email-off projects return a session immediately — take the
+    // learner straight into the app rather than telling them to sign in.
+    if (result.ok && result.mode === "live" && !result.needsConfirmation) {
+      window.location.href = url("/dashboard/");
     }
-    status.className = "form-status is-visible is-success";
-    status.textContent = "Account created. Check your email to confirm, then sign in.";
   });
 </script>

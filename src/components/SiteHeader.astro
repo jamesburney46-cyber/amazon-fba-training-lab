@@ -41,14 +41,13 @@ const links = variant === "app" ? appLinks : publicLinks;
     </nav>
 
     <div class="header-actions">
-      {variant === "public" ? (
-        <>
-          <a class="header-actions__link" href={url("/auth/sign-in/")}>Sign in</a>
-          <a class="header-actions__cta" href={url("/auth/sign-up/")}>Start training</a>
-        </>
-      ) : (
-        <a class="header-actions__link" href={url("/account/")}>Account</a>
-      )}
+      <a class="header-actions__link" href={url("/auth/sign-in/")} data-auth-signed-out>Sign in</a>
+      <a class="header-actions__cta" href={url("/auth/sign-up/")} data-auth-signed-out>Start training</a>
+      <a class="header-actions__link" href={url("/dashboard/")} data-auth-signed-in hidden>Dashboard</a>
+      <a class="header-actions__link" href={url("/account/")} data-auth-signed-in hidden>Account</a>
+      <button class="header-actions__link header-actions__signout" type="button" data-auth-signed-in data-sign-out hidden>
+        Sign out
+      </button>
     </div>
 
     <button
@@ -68,14 +67,13 @@ const links = variant === "app" ? appLinks : publicLinks;
       {links.map((link) => (
         <li><a href={link.href}>{link.label}</a></li>
       ))}
-      {variant === "public" ? (
-        <>
-          <li><a href={url("/auth/sign-in/")}>Sign in</a></li>
-          <li><a href={url("/auth/sign-up/")}>Start training</a></li>
-        </>
-      ) : (
-        <li><a href={url("/account/")}>Account</a></li>
-      )}
+      <li data-auth-signed-out><a href={url("/auth/sign-in/")}>Sign in</a></li>
+      <li data-auth-signed-out><a href={url("/auth/sign-up/")}>Start training</a></li>
+      <li data-auth-signed-in hidden><a href={url("/dashboard/")}>Dashboard</a></li>
+      <li data-auth-signed-in hidden><a href={url("/account/")}>Account</a></li>
+      <li data-auth-signed-in hidden>
+        <button class="link-button" type="button" data-sign-out>Sign out</button>
+      </li>
     </ul>
   </nav>
 </header>
@@ -161,6 +159,13 @@ const links = variant === "app" ? appLinks : publicLinks;
   .header-actions__cta:hover {
     background: var(--accent-400);
   }
+  .header-actions__signout {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+  }
 
   .menu-toggle {
     display: none;
@@ -241,4 +246,40 @@ const links = variant === "app" ? appLinks : publicLinks;
     toggle.setAttribute("aria-expanded", String(Boolean(isOpen)));
     if (mobileNav) mobileNav.hidden = !isOpen;
   });
+</script>
+
+<script>
+  // Client-side session-aware auth actions. GitHub Pages is a static host —
+  // this only changes what the header *shows*, it is not route protection.
+  // In demo mode (no Supabase configured) the signed-out state is the
+  // permanent, honest default.
+  import { getSupabaseClient, isSupabaseConfigured, signOut } from "@/lib/supabase";
+  import { url } from "@/lib/paths";
+
+  const signedOutEls = document.querySelectorAll<HTMLElement>("[data-auth-signed-out]");
+  const signedInEls = document.querySelectorAll<HTMLElement>("[data-auth-signed-in]");
+  const signOutBtns = document.querySelectorAll<HTMLButtonElement>("[data-sign-out]");
+
+  function showSignedIn(signedIn: boolean) {
+    signedOutEls.forEach((el) => {
+      el.hidden = signedIn;
+    });
+    signedInEls.forEach((el) => {
+      el.hidden = !signedIn;
+    });
+  }
+
+  if (isSupabaseConfigured) {
+    const supabase = getSupabaseClient();
+    supabase?.auth.getSession().then(({ data }) => showSignedIn(Boolean(data.session)));
+    supabase?.auth.onAuthStateChange((_event, session) => showSignedIn(Boolean(session)));
+
+    signOutBtns.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        await signOut();
+        window.location.href = url("/");
+      });
+    });
+  }
+  // else: leave the SSR-rendered signed-out state as-is (demo mode).
 </script>

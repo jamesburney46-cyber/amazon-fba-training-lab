@@ -1,0 +1,107 @@
+---
+// Auth callback landing page — the `emailRedirectTo` target Supabase opens
+// after a learner clicks an email-confirmation (or, for older Supabase
+// clients, magic-link) link. @supabase/supabase-js auto-detects the token
+// in the URL (`detectSessionInUrl: true`) and fires an auth-state event;
+// this page just waits for that event and routes on.
+//
+// Password-recovery links are sent straight to `/auth/update-password/`
+// instead (see `sendPasswordReset` in `src/lib/supabase.ts`), but Supabase
+// can still land a recovery session here in some project configurations,
+// so this page forwards a PASSWORD_RECOVERY event there too rather than
+// stranding the learner.
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Callout from "@/components/Callout.astro";
+import { url } from "@/lib/paths";
+---
+
+<BaseLayout title="Confirming" description="Confirming your FBA Operator Lab account.">
+  <div class="container">
+    <div class="auth-shell">
+      <div class="auth-card animate-in">
+        <h1>Confirming your account</h1>
+
+        <div id="demo-notice" hidden>
+          <Callout tone="warning" title="Preview / demo mode">
+            No Supabase project is connected in this deployment, so there is
+            no confirmation link to process. Connect Supabase (see
+            <code>SETUP.md</code>) to enable live email confirmation.
+          </Callout>
+        </div>
+
+        <p class="form-status is-visible" id="callback-status">Checking your link…</p>
+
+        <p class="auth-switch" id="callback-links" hidden>
+          <a href={url("/auth/sign-in/")}>Back to sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+  import { url } from "@/lib/paths";
+
+  const demoNotice = document.getElementById("demo-notice");
+  const status = document.getElementById("callback-status");
+  const links = document.getElementById("callback-links");
+
+  function fail(message: string) {
+    if (status) {
+      status.textContent = message;
+      status.className = "form-status is-visible is-error";
+    }
+    if (links) links.hidden = false;
+  }
+
+  if (!isSupabaseConfigured) {
+    if (demoNotice) demoNotice.hidden = false;
+    if (status) {
+      status.hidden = true;
+      status.classList.remove("is-visible");
+    }
+  } else {
+    // Supabase appends error/error_description/error_code to the URL
+    // (query or hash) when a confirmation/recovery link is invalid or
+    // expired, instead of establishing a session.
+    const params = new URLSearchParams(
+      window.location.search || window.location.hash.replace(/^#/, "")
+    );
+    const errorDescription = params.get("error_description") || params.get("error");
+
+    if (errorDescription) {
+      fail(decodeURIComponent(errorDescription.replace(/\+/g, " ")));
+    } else {
+      const supabase = getSupabaseClient();
+      let settled = false;
+
+      const timeout = window.setTimeout(() => {
+        if (!settled) fail("This link is invalid or has expired. Request a new one and try again.");
+      }, 8000);
+
+      supabase?.auth.onAuthStateChange((event) => {
+        if (settled) return;
+        if (event === "PASSWORD_RECOVERY") {
+          settled = true;
+          window.clearTimeout(timeout);
+          window.location.href = url("/auth/update-password/");
+        } else if (event === "SIGNED_IN") {
+          settled = true;
+          window.clearTimeout(timeout);
+          window.location.href = url("/dashboard/");
+        }
+      });
+
+      // Covers the case where a session already existed by the time this
+      // script ran (event already fired before the listener attached).
+      supabase?.auth.getSession().then(({ data }) => {
+        if (!settled && data.session) {
+          settled = true;
+          window.clearTimeout(timeout);
+          window.location.href = url("/dashboard/");
+        }
+      });
+    }
+  }
+</script>
