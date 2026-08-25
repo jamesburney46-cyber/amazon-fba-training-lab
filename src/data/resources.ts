@@ -48,7 +48,7 @@ export const resources: Resource[] = [
     href: "https://www.youtube.com/watch?v=Yx1eLoNdfmc",
     source: "third-party",
     category: "FBA fundamentals",
-    note: "Week 1, Nights 1 and 3 — FBA-model overview, then the fees/profitability sections.",
+    note: "Week 1, Night 1 — FBA-model overview. Night 3's core fees video is now the dedicated Travis Marziani fees walkthrough.",
   },
   {
     title: "Amazon FBA training-video collection",

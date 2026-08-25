@@ -104,7 +104,7 @@ export const weeks: Week[] = [
           {
             kind: "watch",
             heading: "Watch",
-            items: ["Beginner-course sections on FBA fees and profitability."],
+            items: ["Travis Marziani — Amazon FBA Fees Explained."],
           },
           {
             kind: "do",
