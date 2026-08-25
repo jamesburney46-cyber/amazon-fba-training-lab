@@ -31,18 +31,18 @@ export type LessonVideo = {
 
 export const lessonVideos: LessonVideo[] = [
   {
-    youtubeId: "xQpTTnvxWls",
-    title: "Amazon Seller University — FBA overview",
+    youtubeId: "uY1zkQ2y4yE",
+    title: "Amazon Seller University — How to sell on Amazon for beginners (step-by-step tutorial)",
     source: "official",
-    note: "Amazon's own explanation of the FBA money/product flow — the Night 1 core video.",
+    note: "Amazon's own substantial, step-by-step foundation video covering the full selling/FBA journey — the Night 1 core video.",
     week: 1,
     night: 1,
   },
   {
-    youtubeId: "sZm88N4dNsQ",
-    title: "Amazon Seller University — Intro to Amazon Seller Central",
-    source: "official",
-    note: "Official walkthrough of Seller Central navigation and the menus/widgets Night 2 asks learners to map.",
+    youtubeId: "XzLrsVwau_A",
+    title: "Amazon Seller Central 2026 Dashboard Walkthrough | Step-by-Step Beginner Guide",
+    source: "third-party",
+    note: "Walks through the redesigned Seller Central dashboard — products, inventory, pricing, orders/returns, advertising, A+ content, reports/payments and growth tools — for Night 2's navigation exercise.",
     week: 1,
     night: 2,
   },
