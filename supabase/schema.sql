@@ -95,12 +95,18 @@ create policy "lesson_progress: delete own rows"
 -- ---------------------------------------------------------------------
 -- research_candidates: saved Product Research Machine / Scorecard entries
 -- ---------------------------------------------------------------------
+-- `stage` tracks the Product Research Machine funnel (Stage A-E in
+-- src/data/researchMachine.ts: raw -> fast-rejection -> evidence ->
+-- commercial-model -> investment-case) plus a terminal `rejected` state for
+-- candidates killed at any stage. Scorecard-only saves (src/scripts/scorecard.ts)
+-- default new rows to `investment-case` since the 100-point scorecard is the
+-- Stage D/E full-economics tool.
 create table if not exists public.research_candidates (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   candidate_name text not null,
   stage text not null default 'raw'
-    check (stage in ('raw', 'investigating', 'shortlist', 'rejected')),
+    check (stage in ('raw', 'fast-rejection', 'evidence', 'commercial-model', 'investment-case', 'rejected')),
   scorecard jsonb not null default '{}'::jsonb,
   total_score integer,
   hard_stop_triggered boolean not null default false,
@@ -130,6 +136,43 @@ create policy "research_candidates: delete own rows"
   using (auth.uid() = user_id);
 
 -- ---------------------------------------------------------------------
+-- exam_answers: one row per learner per week's Friday written exam.
+-- Separate from lesson_progress because an exam answer is a single
+-- large free-text response with its own draft/submitted lifecycle,
+-- not a per-night checkpoint.
+-- ---------------------------------------------------------------------
+create table if not exists public.exam_answers (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  week_slug text not null,
+  answer text not null default '',
+  status text not null default 'draft'
+    check (status in ('draft', 'submitted')),
+  submitted_at timestamptz,
+  updated_at timestamptz not null default now(),
+  unique (user_id, week_slug)
+);
+
+alter table public.exam_answers enable row level security;
+
+create policy "exam_answers: select own rows"
+  on public.exam_answers for select
+  using (auth.uid() = user_id);
+
+create policy "exam_answers: insert own rows"
+  on public.exam_answers for insert
+  with check (auth.uid() = user_id);
+
+create policy "exam_answers: update own rows"
+  on public.exam_answers for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "exam_answers: delete own rows"
+  on public.exam_answers for delete
+  using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------
 -- updated_at maintenance trigger
 -- ---------------------------------------------------------------------
 create or replace function public.set_updated_at()
@@ -151,3 +194,27 @@ create trigger set_updated_at before update on public.lesson_progress
 drop trigger if exists set_updated_at on public.research_candidates;
 create trigger set_updated_at before update on public.research_candidates
   for each row execute function public.set_updated_at();
+
+drop trigger if exists set_updated_at on public.exam_answers;
+create trigger set_updated_at before update on public.exam_answers
+  for each row execute function public.set_updated_at();
+
+-- ---------------------------------------------------------------------
+-- Migration for a Supabase project that already ran an earlier version of
+-- this file (i.e. `research_candidates.stage` still only allows
+-- 'raw' / 'investigating' / 'shortlist' / 'rejected'). The constraint
+-- drop/add below is idempotent and safe to re-run on its own.
+--
+-- Do NOT re-run this whole schema.sql file top-to-bottom against a project
+-- that already has `profiles` / `lesson_progress` / `research_candidates`
+-- set up — `create policy` has no `if not exists` guard in Postgres and
+-- will error "policy already exists" for tables that already have their
+-- policies applied. The `exam_answers` block above is new and safe to run
+-- once; this trailing block is the exact delta an already-provisioned
+-- project needs. See supabase/README.md for how to apply it.
+-- ---------------------------------------------------------------------
+alter table public.research_candidates
+  drop constraint if exists research_candidates_stage_check;
+alter table public.research_candidates
+  add constraint research_candidates_stage_check
+  check (stage in ('raw', 'fast-rejection', 'evidence', 'commercial-model', 'investment-case', 'rejected'));

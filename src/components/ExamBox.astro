@@ -1,0 +1,115 @@
+---
+// Real written-response exam form: a large free-text answer with an
+// explicit Save draft / Submit answer lifecycle, persisted per learner —
+// see src/scripts/examAnswer.ts. Rendered once per week inside the Friday
+// exam Card in src/pages/curriculum/[slug]/index.astro.
+interface Props {
+  weekSlug: string;
+}
+const { weekSlug } = Astro.props;
+const inputId = `exam-answer-${weekSlug}`;
+---
+
+<div class="exam-box" data-exam-box data-week-slug={weekSlug}>
+  <label class="exam-box__label" for={inputId}>
+    Your written answer (saved to your account when signed in; kept only in
+    this browser tab when signed out or in demo mode)
+  </label>
+  <textarea
+    id={inputId}
+    class="exam-box__input"
+    data-exam-input
+    rows="16"
+    placeholder="Write your full, unaided answer here…"
+  ></textarea>
+  <div class="exam-box__actions">
+    <button class="exam-box__btn exam-box__btn--draft" type="button" data-exam-save-draft>
+      Save draft
+    </button>
+    <button class="exam-box__btn exam-box__btn--submit" type="button" data-exam-submit>
+      Submit answer
+    </button>
+  </div>
+  <p class="exam-box__status" data-exam-status aria-live="polite"></p>
+  <p class="exam-box__meta" data-exam-meta></p>
+</div>
+
+<style>
+  .exam-box {
+    margin-top: var(--space-5);
+    border: 1px solid var(--border-default);
+    border-left: 3px solid var(--accent-500);
+    border-radius: var(--radius-md);
+    background: var(--bg-inset);
+    padding: var(--space-5);
+  }
+  .exam-box__label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+  }
+  .exam-box__input {
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    resize: vertical;
+    margin-bottom: var(--space-3);
+  }
+  .exam-box__input:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .exam-box__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .exam-box__btn {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    cursor: pointer;
+  }
+  .exam-box__btn--draft {
+    background: var(--bg-surface-raised);
+    color: var(--text-primary);
+  }
+  .exam-box__btn--draft:hover {
+    background: var(--bg-surface-hover);
+  }
+  .exam-box__btn--submit {
+    background: var(--accent-500);
+    color: var(--accent-contrast);
+    border-color: transparent;
+  }
+  .exam-box__status {
+    display: block;
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-xs);
+    color: var(--status-go);
+    min-height: 1.2em;
+  }
+  .exam-box__meta {
+    display: block;
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { initExamBox } from "@/scripts/examAnswer";
+  document.querySelectorAll<HTMLElement>("[data-exam-box]").forEach((box) => {
+    initExamBox(box);
+  });
+</script>

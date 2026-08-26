@@ -1,25 +1,27 @@
 ---
 // Watch -> Do -> Explain Back -> Checkpoint. This renders the Checkpoint
 // step: a short question that proves understanding, not passive viewing.
-import { randomUUID } from "node:crypto";
-
+// Saving it persists the answer and marks the night complete — see
+// src/scripts/checkpoint.ts.
 interface Props {
+  weekSlug: string;
+  lessonSlug: string;
   prompt: string;
 }
-const { prompt } = Astro.props;
+const { weekSlug, lessonSlug, prompt } = Astro.props;
 
 // A curriculum page can render several CheckpointBox instances (one per
 // lesson night), so the input id must be unique per instance — otherwise
 // duplicate ids break the label/textarea association for screen readers.
-const inputId = `checkpoint-answer-${randomUUID().slice(0, 8)}`;
+const inputId = `checkpoint-answer-${weekSlug}-${lessonSlug}`;
 ---
 
-<div class="checkpoint">
+<div class="checkpoint" data-checkpoint data-week-slug={weekSlug} data-lesson-slug={lessonSlug}>
   <p class="checkpoint__kicker">Checkpoint</p>
   <p class="checkpoint__prompt">{prompt}</p>
   <label class="checkpoint__label" for={inputId}>
-    Your answer (saved to your account when Supabase is connected; kept only
-    in this browser tab in demo mode)
+    Your answer (saved to your account when signed in; kept only in this
+    browser tab when signed out or in demo mode)
   </label>
   <textarea
     id={inputId}
@@ -99,21 +101,6 @@ const inputId = `checkpoint-answer-${randomUUID().slice(0, 8)}`;
 </style>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>("[data-checkpoint-save]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const box = btn.closest(".checkpoint");
-      const status = box?.querySelector<HTMLElement>("[data-checkpoint-status]");
-      const textarea = box?.querySelector<HTMLTextAreaElement>("textarea");
-      if (!status || !textarea) return;
-      if (!textarea.value.trim()) {
-        status.textContent = "Write an answer before saving.";
-        status.style.color = "var(--status-investigate)";
-        return;
-      }
-      // Demo-mode local save only. A connected Supabase project would
-      // upsert this into lesson_progress instead — see src/lib/supabase.ts.
-      status.textContent = "Saved locally (demo mode).";
-      status.style.color = "var(--status-go)";
-    });
-  });
+  import { initCheckpoints } from "@/scripts/checkpoint";
+  initCheckpoints();
 </script>

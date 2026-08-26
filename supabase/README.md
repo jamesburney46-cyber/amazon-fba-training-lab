@@ -9,10 +9,19 @@ connected** — the app runs in demo mode until you wire one up.
 1. Create a free project at https://supabase.com (free tier is sufficient
    for this app's scope).
 2. In the Supabase SQL editor, run `schema.sql` from this directory. It
-   creates `profiles`, `lesson_progress`, `research_candidates`, Row Level
-   Security policies that restrict every row to `auth.uid()`, and a
-   `handle_new_user` trigger that creates a `profiles` row automatically
-   whenever someone signs up (reading the name from sign-up metadata).
+   creates `profiles`, `lesson_progress`, `research_candidates`,
+   `exam_answers`, Row Level Security policies that restrict every row to
+   `auth.uid()`, and a `handle_new_user` trigger that creates a `profiles`
+   row automatically whenever someone signs up (reading the name from
+   sign-up metadata).
+
+   **If a project already ran an earlier version of `schema.sql`:** do not
+   re-run the whole file (`create policy` has no `if not exists` guard and
+   will error on tables that already have policies). Instead run only the
+   `exam_answers` block and the trailing migration block at the bottom of
+   `schema.sql` — together they add the `exam_answers` table (if missing)
+   and widen `research_candidates.stage` to the current Product Research
+   Machine funnel values. Both are safe to run on their own.
 3. In Supabase → Project Settings → API, copy the **Project URL** and the
    **anon/public key** (never the `service_role` key).
 4. Copy `.env.example` to `.env` at the repo root and paste those two

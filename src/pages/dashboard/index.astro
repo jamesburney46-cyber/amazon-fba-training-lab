@@ -18,9 +18,18 @@ const nextLesson = currentWeek.lessons?.[0];
 <AppLayout title="Dashboard" description="Your FBA Operator Lab training dashboard.">
   <div id="demo-banner" hidden>
     <Callout tone="warning" title="Preview / demo mode">
-      No Supabase project is connected, so this dashboard shows illustrative
-      sample progress rather than a real saved account. Connect Supabase
-      (see <code>SETUP.md</code>) to track real progress.
+      No Supabase project is connected, so this dashboard shows zero/
+      placeholder progress rather than a real saved account. Connect
+      Supabase (see <code>SETUP.md</code>) to track real progress.
+    </Callout>
+  </div>
+  <div id="signed-out-banner" hidden>
+    <Callout tone="warning" title="Not signed in">
+      You're not signed in, so this dashboard shows zero/placeholder
+      progress rather than a real saved account.
+      <a href={url("/auth/sign-in/")}>Sign in</a> or
+      <a href={url("/auth/sign-up/")}>create an account</a> to track real
+      progress.
     </Callout>
   </div>
 
@@ -36,15 +45,23 @@ const nextLesson = currentWeek.lessons?.[0];
 
   <div class="stat-row">
     <StatTile label="Current week" value={`Week ${currentWeek.n}`} hint={currentWeek.title} featured />
-    <StatTile label="Lessons complete" value="0 / 5" hint="This week" />
-    <StatTile label="Checkpoints saved" value="0" hint="Demo mode: local only" />
-    <StatTile label="Research candidates" value="0" hint="In the Product Research Machine" />
+    <div data-stat="lessons-complete">
+      <StatTile label="Lessons complete" value="0 / 5" hint="This week" />
+    </div>
+    <div data-stat="checkpoints-saved">
+      <StatTile label="Checkpoints saved" value="0" hint="Sign in to save to your account" />
+    </div>
+    <div data-stat="research-candidates">
+      <StatTile label="Research candidates" value="0" hint="In the Product Research Machine" />
+    </div>
   </div>
 
   <div class="dashboard-grid">
     <Card>
       <h2>Course progress</h2>
-      <ProgressBar value={0} label="Programme complete (12 weeks)" />
+      <div data-progress="programme">
+        <ProgressBar value={0} label="Programme complete (12 weeks)" />
+      </div>
       <p class="dashboard-note">
         Overall programme progress. Weeks 3–12 are planned but not yet open,
         so progress can only reach the Week 1–2 portion of the programme in
@@ -71,7 +88,7 @@ const nextLesson = currentWeek.lessons?.[0];
 
     <Card>
       <h2>Recent work</h2>
-      <p class="empty-state">
+      <p class="empty-state" data-recent-work>
         No checkpoints saved yet. Complete a lesson's Checkpoint step and it
         will appear here.
       </p>
@@ -82,7 +99,7 @@ const nextLesson = currentWeek.lessons?.[0];
 
     <Card>
       <h2>Research practice</h2>
-      <p class="empty-state">
+      <p class="empty-state" data-research-practice>
         No candidates saved yet. Run an idea through the Product Research
         Machine to build your first candidate card.
       </p>
@@ -94,9 +111,91 @@ const nextLesson = currentWeek.lessons?.[0];
 </AppLayout>
 
 <script>
-  import { isSupabaseConfigured } from "@/lib/supabase";
-  const banner = document.getElementById("demo-banner");
-  if (!isSupabaseConfigured && banner) banner.hidden = false;
+  import { getCurrentSession, getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+  import { weeks } from "@/data/curriculum";
+
+  const demoBanner = document.getElementById("demo-banner");
+  const signedOutBanner = document.getElementById("signed-out-banner");
+  const currentWeek = weeks[0];
+
+  function setStat(key: string, value: string, hint?: string) {
+    const wrap = document.querySelector(`[data-stat="${key}"]`);
+    if (!wrap) return;
+    const valueEl = wrap.querySelector(".stat__value");
+    if (valueEl) valueEl.textContent = value;
+    if (hint !== undefined) {
+      const hintEl = wrap.querySelector(".stat__hint");
+      if (hintEl) hintEl.textContent = hint;
+    }
+  }
+
+  function setProgress(pct: number) {
+    const wrap = document.querySelector('[data-progress="programme"]');
+    const fill = wrap?.querySelector<HTMLElement>(".progress__fill");
+    const track = wrap?.querySelector(".progress__track");
+    const pctLabel = wrap?.querySelectorAll(".progress__label span")[1];
+    if (fill) fill.style.width = `${pct}%`;
+    if (pctLabel) pctLabel.textContent = `${pct}%`;
+    track?.setAttribute("aria-valuenow", String(pct));
+  }
+
+  async function run() {
+    if (!isSupabaseConfigured) {
+      if (demoBanner) demoBanner.hidden = false;
+      return;
+    }
+
+    const supabase = getSupabaseClient();
+    const session = await getCurrentSession();
+    if (!session?.user || !supabase) {
+      if (signedOutBanner) signedOutBanner.hidden = false;
+      return;
+    }
+    const userId = session.user.id;
+
+    const [{ data: progressRows }, { data: candidateRows }] = await Promise.all([
+      supabase
+        .from("lesson_progress")
+        .select("week_slug, lesson_slug, status, checkpoint_answer, updated_at")
+        .eq("user_id", userId),
+      supabase.from("research_candidates").select("id").eq("user_id", userId),
+    ]);
+
+    const rows = progressRows ?? [];
+    const currentWeekRows = rows.filter((r) => r.week_slug === currentWeek.slug);
+    const completeThisWeek = currentWeekRows.filter((r) => r.status === "complete").length;
+    const totalLessonsThisWeek = currentWeek.lessons?.length ?? 0;
+    setStat("lessons-complete", `${completeThisWeek} / ${totalLessonsThisWeek}`, "This week");
+
+    const checkpointsSaved = rows.filter((r) => r.checkpoint_answer && r.checkpoint_answer.trim().length > 0).length;
+    setStat("checkpoints-saved", String(checkpointsSaved), "Saved to your account");
+
+    const candidateCount = (candidateRows ?? []).length;
+    setStat("research-candidates", String(candidateCount), "In the Product Research Machine");
+
+    const totalLessonsProgramme = weeks.reduce((sum, w) => sum + (w.lessons?.length ?? 0), 0);
+    const completeProgramme = rows.filter((r) => r.status === "complete").length;
+    const pct = totalLessonsProgramme > 0 ? Math.round((completeProgramme / totalLessonsProgramme) * 100) : 0;
+    setProgress(pct);
+
+    const recentWork = document.querySelector("[data-recent-work]");
+    if (recentWork) {
+      recentWork.textContent =
+        checkpointsSaved > 0
+          ? `${checkpointsSaved} checkpoint${checkpointsSaved === 1 ? "" : "s"} saved to your account so far.`
+          : "No checkpoints saved yet. Complete a lesson's Checkpoint step and it will appear here.";
+    }
+
+    const researchPractice = document.querySelector("[data-research-practice]");
+    if (researchPractice) {
+      researchPractice.textContent =
+        candidateCount > 0
+          ? `${candidateCount} candidate${candidateCount === 1 ? "" : "s"} saved to your account.`
+          : "No candidates saved yet. Run an idea through the Product Research Machine to build your first candidate card.";
+    }
+  }
+
+  void run();
 </script>
 
 <style>

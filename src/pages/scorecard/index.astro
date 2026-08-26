@@ -2,6 +2,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import Callout from "@/components/Callout.astro";
 import { scorecardFactors, hardStopGates, totalWeight } from "@/data/scorecard";
+import { url } from "@/lib/paths";
 ---
 
 <AppLayout
@@ -18,11 +19,32 @@ import { scorecardFactors, hardStopGates, totalWeight } from "@/data/scorecard";
     </p>
   </header>
 
-  <Callout tone="warning" title="Demo-mode tool — no live Amazon integration">
-    Scores and saved candidates live only in this browser (local storage).
-    Nothing here reads real Amazon data. Connect Supabase and sign in to
-    persist candidates to your account — see <code>SETUP.md</code>.
+  <Callout tone="info" title="No live Amazon integration">
+    Nothing on this page reads real Amazon data — it is a scoring practice
+    tool only.
   </Callout>
+
+  <div id="demo-banner" hidden>
+    <Callout tone="warning" title="Demo mode — no Supabase project connected">
+      Scores and saved candidates live only in this browser (local
+      storage). Connect Supabase — see <code>SETUP.md</code> — to persist
+      candidates to your account.
+    </Callout>
+  </div>
+  <div id="signed-out-banner" hidden>
+    <Callout tone="warning" title="Not signed in">
+      Scores and saved candidates live only in this browser (local
+      storage), not your account. <a href={url("/auth/sign-in/")}>Sign in</a>
+      or <a href={url("/auth/sign-up/")}>create an account</a> to persist
+      candidates to your account.
+    </Callout>
+  </div>
+  <div id="signed-in-banner" hidden>
+    <Callout tone="success" title="Saved to your account">
+      Saved candidates read and write to your Supabase account — they
+      persist across devices and sessions.
+    </Callout>
+  </div>
 
   <div class="scorecard" data-scorecard>
     <section class="panel">

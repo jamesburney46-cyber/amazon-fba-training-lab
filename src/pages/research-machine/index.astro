@@ -2,6 +2,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import Callout from "@/components/Callout.astro";
 import { funnelStages, researchDiscipline } from "@/data/researchMachine";
+import { url } from "@/lib/paths";
 
 const stageLabels: Record<string, string> = {
   raw: "A · Raw ideas",
@@ -27,11 +28,27 @@ const stageLabels: Record<string, string> = {
     </p>
   </header>
 
-  <Callout tone="warning" title="Demo-mode board">
-    Your board is saved only in this browser (local storage), not to an
-    account. Connect Supabase and sign in to persist candidates across
-    devices — see <code>SETUP.md</code>.
-  </Callout>
+  <div id="demo-banner" hidden>
+    <Callout tone="warning" title="Demo mode — no Supabase project connected">
+      Your board is saved only in this browser (local storage), not to an
+      account. Connect Supabase — see <code>SETUP.md</code> — to persist
+      candidates across devices.
+    </Callout>
+  </div>
+  <div id="signed-out-banner" hidden>
+    <Callout tone="warning" title="Not signed in">
+      Your board is saved only in this browser (local storage), not to an
+      account. <a href={url("/auth/sign-in/")}>Sign in</a> or
+      <a href={url("/auth/sign-up/")}>create an account</a> to persist
+      candidates across devices.
+    </Callout>
+  </div>
+  <div id="signed-in-banner" hidden>
+    <Callout tone="success" title="Saved to your account">
+      This board reads and writes your candidates to your Supabase account —
+      it persists across devices and sessions.
+    </Callout>
+  </div>
 
   <section class="funnel-guide">
     {funnelStages.map((stage) => (
@@ -78,6 +95,7 @@ const stageLabels: Record<string, string> = {
       </button>
     </div>
     <p class="board__error" data-add-error role="alert"></p>
+    <p class="board__status" data-board-status role="status" aria-live="polite"></p>
 
     <div class="board__columns">
       {["raw", "fast-rejection", "evidence", "commercial-model", "investment-case"].map((stage) => (
@@ -216,6 +234,12 @@ const stageLabels: Record<string, string> = {
     font-size: var(--text-sm);
     min-height: 1.2em;
     margin: var(--space-2) 0 var(--space-4);
+  }
+  .board__status {
+    color: var(--status-go);
+    font-size: var(--text-xs);
+    min-height: 1.2em;
+    margin: 0 0 var(--space-4);
   }
 
   .board__columns {

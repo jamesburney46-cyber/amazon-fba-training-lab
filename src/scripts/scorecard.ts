@@ -1,8 +1,14 @@
 // 100-point Candidate Scorecard — client-side calculator.
-// Demo-mode: saved scorecards live in localStorage. When Supabase is
-// connected, this is the natural place to upsert into the
-// `research_candidates` table instead (see src/lib/supabase.ts).
-import { scorecardFactors, hardStopGates, bandForScore, recommendationFor } from "@/data/scorecard";
+//
+// Signed-in learners (Supabase configured + a live session) save the score
+// payload, hard stops, total score and recommendation to the same
+// `research_candidates` table the Product Research Machine uses — a saved
+// scorecard defaults to the `investment-case` funnel stage, since the
+// 100-point scorecard is the Stage D/E full-economics tool (see
+// src/data/researchMachine.ts). Everyone else falls back to this browser's
+// local storage — the UI copy must say so honestly.
+import { scorecardFactors, bandForScore, recommendationFor } from "@/data/scorecard";
+import { getCurrentSession, getSupabaseClient } from "@/lib/supabase";
 
 const STORAGE_KEY = "fba_lab_scorecards_v1";
 
@@ -16,7 +22,11 @@ type SavedScorecard = {
   savedAt: string;
 };
 
-function loadSaved(): SavedScorecard[] {
+function localId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function loadLocal(): SavedScorecard[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as SavedScorecard[]) : [];
@@ -25,8 +35,29 @@ function loadSaved(): SavedScorecard[] {
   }
 }
 
-function persistSaved(list: SavedScorecard[]) {
+function persistLocal(list: SavedScorecard[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+type ScorecardRow = {
+  id: string;
+  candidate_name: string;
+  scorecard: { scores?: Record<string, number>; hardStops?: string[] } | null;
+  total_score: number | null;
+  recommendation: "GO" | "INVESTIGATE" | "REJECT" | null;
+  updated_at: string;
+};
+
+function rowToSaved(row: ScorecardRow): SavedScorecard {
+  return {
+    id: row.id,
+    candidateName: row.candidate_name,
+    scores: row.scorecard?.scores ?? {},
+    hardStops: row.scorecard?.hardStops ?? [],
+    totalScore: row.total_score ?? 0,
+    recommendation: row.recommendation ?? "REJECT",
+    savedAt: row.updated_at,
+  };
 }
 
 export function initScorecard(root: HTMLElement) {
@@ -41,6 +72,14 @@ export function initScorecard(root: HTMLElement) {
   const resetBtn = root.querySelector<HTMLButtonElement>("[data-reset]");
   const savedList = root.querySelector<HTMLElement>("[data-saved-list]");
   const saveStatus = root.querySelector<HTMLElement>("[data-save-status]");
+
+  const demoBanner = document.getElementById("demo-banner");
+  const signedOutBanner = document.getElementById("signed-out-banner");
+  const signedInBanner = document.getElementById("signed-in-banner");
+
+  const supabase = getSupabaseClient();
+  let userId: string | null = null;
+  let live = false;
 
   const scores: Record<string, number> = {};
   for (const f of scorecardFactors) scores[f.key] = 0;
@@ -91,9 +130,23 @@ export function initScorecard(root: HTMLElement) {
     el.addEventListener("change", recalc);
   });
 
-  function renderSaved() {
+  async function fetchSaved(): Promise<SavedScorecard[]> {
+    if (live && supabase && userId) {
+      const { data, error } = await supabase
+        .from("research_candidates")
+        .select("id, candidate_name, scorecard, total_score, recommendation, updated_at")
+        .eq("user_id", userId)
+        .not("total_score", "is", null)
+        .order("updated_at", { ascending: false });
+      if (error) return [];
+      return (data ?? []).map((row) => rowToSaved(row as ScorecardRow));
+    }
+    return loadLocal();
+  }
+
+  async function renderSaved() {
     if (!savedList) return;
-    const list = loadSaved();
+    const list = await fetchSaved();
     savedList.innerHTML = "";
     if (list.length === 0) {
       const empty = document.createElement("p");
@@ -102,7 +155,7 @@ export function initScorecard(root: HTMLElement) {
       savedList.appendChild(empty);
       return;
     }
-    for (const item of list.slice().reverse()) {
+    for (const item of list) {
       const row = document.createElement("div");
       row.className = "saved-row";
 
@@ -123,9 +176,13 @@ export function initScorecard(root: HTMLElement) {
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.textContent = "Delete";
-      deleteBtn.addEventListener("click", () => {
-        persistSaved(loadSaved().filter((s) => s.id !== item.id));
-        renderSaved();
+      deleteBtn.addEventListener("click", async () => {
+        if (live && supabase && userId) {
+          await supabase.from("research_candidates").delete().eq("id", item.id).eq("user_id", userId);
+        } else {
+          persistLocal(loadLocal().filter((s) => s.id !== item.id));
+        }
+        await renderSaved();
       });
       actions.appendChild(deleteBtn);
 
@@ -151,28 +208,51 @@ export function initScorecard(root: HTMLElement) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  saveBtn?.addEventListener("click", () => {
+  function setSaveStatus(text: string, isError = false) {
+    if (!saveStatus) return;
+    saveStatus.textContent = text;
+    saveStatus.style.color = isError ? "var(--status-reject)" : "var(--status-go)";
+    setTimeout(() => {
+      if (saveStatus) saveStatus.textContent = "";
+    }, 4000);
+  }
+
+  saveBtn?.addEventListener("click", async () => {
     const total = totalScore();
     const hardStops = currentHardStops();
-    const record: SavedScorecard = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      candidateName: nameInput?.value.trim() || "Untitled candidate",
-      scores: { ...scores },
-      hardStops,
-      totalScore: total,
-      recommendation: recommendationFor(total, hardStops.length > 0),
-      savedAt: new Date().toISOString(),
-    };
-    const list = loadSaved();
-    list.push(record);
-    persistSaved(list);
-    renderSaved();
-    if (saveStatus) {
-      saveStatus.textContent = "Saved locally (demo mode).";
-      setTimeout(() => {
-        if (saveStatus) saveStatus.textContent = "";
-      }, 3000);
+    const candidateName = nameInput?.value.trim() || "Untitled candidate";
+    const recommendation = recommendationFor(total, hardStops.length > 0);
+
+    if (live && supabase && userId) {
+      const { error } = await supabase.from("research_candidates").insert({
+        user_id: userId,
+        candidate_name: candidateName,
+        stage: "investment-case",
+        scorecard: { scores: { ...scores }, hardStops },
+        total_score: total,
+        hard_stop_triggered: hardStops.length > 0,
+        recommendation,
+      });
+      if (error) {
+        setSaveStatus("Could not save to your account — try again.", true);
+        return;
+      }
+      setSaveStatus("Saved to your account.");
+    } else {
+      const list = loadLocal();
+      list.push({
+        id: localId(),
+        candidateName,
+        scores: { ...scores },
+        hardStops,
+        totalScore: total,
+        recommendation,
+        savedAt: new Date().toISOString(),
+      });
+      persistLocal(list);
+      setSaveStatus("Saved locally — sign in to save to your account.");
     }
+    await renderSaved();
   });
 
   printBtn?.addEventListener("click", () => window.print());
@@ -217,6 +297,22 @@ export function initScorecard(root: HTMLElement) {
     return div.innerHTML;
   }
 
-  recalc();
-  renderSaved();
+  async function init() {
+    const session = supabase ? await getCurrentSession() : null;
+    userId = session?.user?.id ?? null;
+    live = Boolean(supabase && userId);
+
+    if (!supabase) {
+      if (demoBanner) demoBanner.hidden = false;
+    } else if (!userId) {
+      if (signedOutBanner) signedOutBanner.hidden = false;
+    } else {
+      if (signedInBanner) signedInBanner.hidden = false;
+    }
+
+    recalc();
+    await renderSaved();
+  }
+
+  void init();
 }
