@@ -65,7 +65,8 @@ const funnel = [
           any capital is ever committed.
         </p>
         <div class="hero__actions">
-          <Button href={url("/auth/sign-up/")} size="md">Start training</Button>
+          <Button href={url("/auth/sign-up/")} size="md" data-auth-signed-out>Start training</Button>
+          <Button href={url("/dashboard/")} size="md" data-auth-signed-in hidden>Continue training</Button>
           <Button href={url("/curriculum/")} variant="secondary" size="md">
             Preview the curriculum
           </Button>
@@ -222,7 +223,8 @@ const funnel = [
         are visible before you sign in.
       </p>
       <div class="hero__actions">
-        <Button href={url("/auth/sign-up/")}>Create free account</Button>
+        <Button href={url("/auth/sign-up/")} data-auth-signed-out>Create free account</Button>
+        <Button href={url("/dashboard/")} data-auth-signed-in hidden>Continue training</Button>
         <Button href={url("/scorecard/")} variant="secondary">
           Try the 100-point scorecard
         </Button>
