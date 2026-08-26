@@ -1,6 +1,7 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import Callout from "@/components/Callout.astro";
+import ecoFlexPreview from "@/assets/research-machine/ecoflex-preview.png";
 import { funnelStages, researchDiscipline } from "@/data/researchMachine";
 import { url } from "@/lib/paths";
 
@@ -103,14 +104,12 @@ const stageLabels: Record<string, string> = {
     </div>
 
     <div class="result-preview__visual">
-      <div class="product-mock">
-        <div class="product-mock__case"></div>
-        <div class="product-mock__utensil product-mock__utensil--fork">♜</div>
-        <div class="product-mock__utensil product-mock__utensil--spoon">●</div>
-        <div class="product-mock__utensil product-mock__utensil--knife"></div>
-        <p>EcoFlex</p>
-        <span>Bamboo travel cutlery set</span>
-      </div>
+      <img
+        class="result-preview__hero-image"
+        src={ecoFlexPreview.src}
+        alt="Illustrative EcoFlex Bamboo Travel Cutlery Set product research result"
+        loading="lazy"
+      />
 
       <div class="result-preview__metrics">
         <div>
@@ -816,6 +815,15 @@ const stageLabels: Record<string, string> = {
     .result-preview__top {
       flex-direction: column;
     }
+  }
+
+
+  .result-preview__hero-image {
+    width: 100%;
+    display: block;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    object-fit: cover;
   }
 
 </style>
