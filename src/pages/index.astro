@@ -166,7 +166,13 @@ const funnel = [
         {weeks.map((w) => {
           const previewVideo = getWeekPreviewVideo(w.n);
           return (
-            <li class:list={["week-tile", { "week-tile--planned": w.status === "planned" }]}>
+            <li
+              class:list={[
+                "week-tile",
+                `week-tile--${((w.n - 1) % 4) + 1}`,
+                { "week-tile--planned": w.status === "planned" },
+              ]}
+            >
               {previewVideo && (
                 <VideoThumb
                   youtubeId={previewVideo.youtubeId}
@@ -834,6 +840,253 @@ const funnel = [
   .funnel__badge--decision,
   .hero__funnel-badge--decision {
     box-shadow: 0 0 20px color-mix(in srgb, #f5b942 14%, transparent);
+  }
+
+
+  /* ================================================================
+     Stronger learning colour system
+     Blue = Watch / active
+     Green = Do / success
+     Purple = Explain / evidence
+     Gold = Checkpoint / milestone
+     ================================================================ */
+
+  .pillar-card {
+    border-color: color-mix(
+      in srgb,
+      var(--pillar-accent) 28%,
+      var(--border-default)
+    );
+  }
+
+  .pillar-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        80% 60% at 20% 0%,
+        color-mix(in srgb, var(--pillar-accent) 14%, transparent),
+        transparent 70%
+      );
+  }
+
+  .pillar-card h3 {
+    color: var(--text-primary);
+  }
+
+  .pillar-card .pillar__index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: color-mix(
+      in srgb,
+      var(--pillar-accent) 16%,
+      var(--bg-inset)
+    );
+    border: 1px solid color-mix(
+      in srgb,
+      var(--pillar-accent) 34%,
+      transparent
+    );
+    color: var(--pillar-accent);
+    font-weight: var(--weight-bold);
+  }
+
+  .pillar-card--1 {
+    --pillar-accent: #60a5fa;
+  }
+
+  .pillar-card--2 {
+    --pillar-accent: #34d399;
+  }
+
+  .pillar-card--3 {
+    --pillar-accent: #a78bfa;
+  }
+
+  .pillar-card--4 {
+    --pillar-accent: #f5b942;
+  }
+
+  /* Make the main training section feel more like a learning environment. */
+  .section:first-of-type {
+    background:
+      radial-gradient(
+        45% 70% at 10% 20%,
+        rgba(96, 165, 250, 0.055),
+        transparent 70%
+      ),
+      radial-gradient(
+        40% 65% at 90% 70%,
+        rgba(167, 139, 250, 0.045),
+        transparent 70%
+      );
+  }
+
+  /* ------------------------------------------------
+     12-week journey
+     ------------------------------------------------ */
+
+  .week-tile {
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 160ms ease,
+      border-color 160ms ease,
+      background 160ms ease;
+  }
+
+  .week-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--week-accent);
+    opacity: 0.95;
+  }
+
+  .week-tile:not(.week-tile--planned) {
+    border-color: color-mix(
+      in srgb,
+      var(--week-accent) 34%,
+      var(--border-default)
+    );
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--week-accent) 7%, transparent),
+        transparent 55%
+      ),
+      var(--bg-surface);
+  }
+
+  .week-tile:not(.week-tile--planned):hover {
+    transform: translateY(-2px);
+    border-color: color-mix(
+      in srgb,
+      var(--week-accent) 52%,
+      var(--border-default)
+    );
+  }
+
+  .week-tile--planned::before {
+    opacity: 0.22;
+  }
+
+  .week-tile--planned {
+    opacity: 0.62;
+  }
+
+  .week-tile--1 {
+    --week-accent: #60a5fa;
+  }
+
+  .week-tile--2 {
+    --week-accent: #34d399;
+  }
+
+  .week-tile--3 {
+    --week-accent: #a78bfa;
+  }
+
+  .week-tile--4 {
+    --week-accent: #f5b942;
+  }
+
+  .week-tile__number {
+    color: var(--week-accent);
+    font-weight: var(--weight-semibold);
+  }
+
+  .week-tile__status {
+    width: fit-content;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: color-mix(
+      in srgb,
+      var(--week-accent) 12%,
+      var(--bg-inset)
+    );
+    color: color-mix(
+      in srgb,
+      var(--week-accent) 82%,
+      white
+    );
+    border: 1px solid color-mix(
+      in srgb,
+      var(--week-accent) 22%,
+      transparent
+    );
+  }
+
+  .week-tile--planned .week-tile__status {
+    background: var(--bg-inset);
+    color: var(--text-muted);
+    border-color: var(--border-subtle);
+  }
+
+  /* ------------------------------------------------
+     Research funnel
+     ------------------------------------------------ */
+
+  .funnel__stage:nth-child(1) .funnel__badge {
+    background: rgba(96, 165, 250, 0.13);
+    color: #60a5fa;
+  }
+
+  .funnel__stage:nth-child(2) .funnel__badge {
+    background: rgba(52, 211, 153, 0.13);
+    color: #34d399;
+  }
+
+  .funnel__stage:nth-child(3) .funnel__badge {
+    background: rgba(167, 139, 250, 0.13);
+    color: #a78bfa;
+  }
+
+  .funnel__stage:nth-child(4) .funnel__badge {
+    background: rgba(96, 165, 250, 0.13);
+    color: #60a5fa;
+  }
+
+  .funnel__stage:nth-child(5) .funnel__badge {
+    background: rgba(245, 185, 66, 0.14);
+    color: #f5b942;
+  }
+
+  /* ------------------------------------------------
+     Section rhythm and CTA emphasis
+     ------------------------------------------------ */
+
+  .section__head h2::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      #60a5fa,
+      #34d399,
+      #a78bfa,
+      #f5b942
+    );
+  }
+
+  .cta {
+    background:
+      radial-gradient(
+        50% 120% at 50% 100%,
+        rgba(96, 165, 250, 0.09),
+        transparent 65%
+      ),
+      var(--bg-canvas);
   }
 
 </style>
