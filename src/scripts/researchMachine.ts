@@ -220,7 +220,7 @@ export function initResearchMachine(root: HTMLElement) {
     });
   }
 
-  async function addCandidate(name: string) {
+  async function addCandidate(name: string): Promise<Candidate | null> {
     if (live && supabase && userId) {
       const { data, error } = await supabase
         .from("research_candidates")
@@ -228,8 +228,11 @@ export function initResearchMachine(root: HTMLElement) {
         .select("id, candidate_name, stage, recommendation")
         .single();
       if (error || !data) {
-        setBoardStatus("Could not save to your account — try again.", true);
-        return;
+        const detail = error
+          ? [error.message, error.details, error.hint].filter(Boolean).join(" — ")
+          : "No row was returned by Supabase.";
+        setBoardStatus(`Could not save to your account: ${detail}`, true);
+        return null;
       }
       state.candidates.push(rowToCandidate(data as CandidateRow));
     } else {
@@ -237,7 +240,9 @@ export function initResearchMachine(root: HTMLElement) {
     }
     setBoardStatus(savedMessage());
     render();
-    focusCandidate(state.candidates[state.candidates.length - 1].id, "raw");
+    const added = state.candidates[state.candidates.length - 1];
+    focusCandidate(added.id, "raw");
+    return added;
   }
 
   async function advanceCandidate(candidate: Candidate, upcoming: Stage) {
@@ -334,7 +339,14 @@ export function initResearchMachine(root: HTMLElement) {
       copySampleStatus.style.color = "var(--status-reject)";
       return;
     }
-    await addCandidate(SAMPLE_CANDIDATE_NAME);
+    const added = await addCandidate(SAMPLE_CANDIDATE_NAME);
+    if (!added) {
+      copySampleStatus.textContent =
+        "Copy failed — see the board error message below for the database response.";
+      copySampleStatus.style.color = "var(--status-reject)";
+      return;
+    }
+
     copySampleStatus.textContent = live
       ? "Copied to Stage A on your account board below."
       : "Copied to Stage A on this browser's board below (local storage).";
