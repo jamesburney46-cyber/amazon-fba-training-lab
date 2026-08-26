@@ -1,6 +1,6 @@
-// Curriculum data source. Weeks 1–2 are fully populated for Phase 1.
-// Weeks 3–12 are intentionally titles/goals only ("planned") — do not
-// populate their nightly content in this phase.
+// Curriculum data source. Weeks 1–3 are fully populated.
+// Weeks 4–12 remain titles/goals only ("planned") until their
+// nightly content is built.
 
 export type LessonStep = {
   kind: "watch" | "do" | "explain" | "checkpoint";
@@ -236,7 +236,173 @@ export const weeks: Week[] = [
     passStandard:
       "At least as much emphasis on reasons to reject as reasons to buy.",
   },
-  { n: 3, slug: "week-3", title: "Competition, reviews and differentiation", goal: "Find the customer problem hiding inside competitor reviews.", status: "planned" },
+  {
+    n: 3,
+    slug: "week-3",
+    title: "Competition, reviews and differentiation",
+    goal: "Find the customer problem hiding inside competitor reviews, then prove whether solving it creates a defensible product opportunity.",
+    status: "live",
+    lessons: [
+      {
+        night: 1,
+        title: "Map the competitive landscape",
+        steps: [
+          {
+            kind: "watch",
+            heading: "Watch / read",
+            items: [
+              "Review a structured Amazon competitor-analysis walkthrough.",
+              "Focus on market shape rather than simply counting how many sellers exist.",
+            ],
+          },
+          {
+            kind: "do",
+            heading: "Do",
+            items: [
+              "Choose one surviving Week 2 product idea and search its primary shopper keyword on Amazon UK.",
+              "Record at least ten directly relevant competing listings.",
+              "For each competitor capture: selling price, review count, star rating, brand, pack size or specification, listing quality, main promise and obvious differentiator.",
+              "Mark whether the market appears fragmented across many sellers or concentrated around a few dominant brands.",
+            ],
+          },
+          {
+            kind: "explain",
+            heading: "Explain back",
+            items: [
+              "Describe the shape of this market in plain English: who appears to win, why customers may choose them, and what makes entry difficult.",
+            ],
+          },
+          {
+            kind: "checkpoint",
+            heading: "Checkpoint",
+            items: [],
+            checkpointPrompt:
+              "Is this market fragmented, competitive-but-enterable, or dominated? Give three pieces of evidence for your classification.",
+          },
+        ],
+      },
+      {
+        night: 2,
+        title: "Mine competitor reviews for customer problems",
+        steps: [
+          {
+            kind: "watch",
+            heading: "Watch / read",
+            items: [
+              "Review a practical walkthrough of using competitor reviews as product-research evidence.",
+              "Pay particular attention to recurring complaints rather than isolated bad reviews.",
+            ],
+          },
+          {
+            kind: "do",
+            heading: "Do",
+            items: [
+              "Choose five of the strongest competitors from Night 1.",
+              "Read a meaningful sample of 1–3 star reviews, plus recent 4–5 star reviews for context.",
+              "Create a complaint log with four columns: problem, frequency, severity, and whether it appears realistically fixable.",
+              "Group similar complaints into themes rather than copying individual reviews.",
+              "Identify positive features customers repeatedly praise so you do not accidentally remove something the market already values.",
+            ],
+          },
+          {
+            kind: "explain",
+            heading: "Explain back",
+            items: [
+              "Explain the difference between a customer complaint and a genuine product opportunity. A complaint matters only if it is recurring, important and realistically solvable.",
+            ],
+          },
+          {
+            kind: "checkpoint",
+            heading: "Checkpoint",
+            items: [],
+            checkpointPrompt:
+              "List the three strongest recurring customer problems you found. For each, state how often it appeared, why it matters, and whether you believe it can be fixed commercially.",
+          },
+        ],
+      },
+      {
+        night: 3,
+        title: "Turn complaints into differentiation",
+        steps: [
+          {
+            kind: "watch",
+            heading: "Watch / read",
+            items: [
+              "Review examples of product differentiation that change customer value rather than merely changing colour, logo or packaging.",
+            ],
+          },
+          {
+            kind: "do",
+            heading: "Do",
+            items: [
+              "Take the strongest review themes from Night 2 and generate at least five possible improvements.",
+              "Classify each improvement as product design, material/specification, bundle, packaging/instructions, or positioning.",
+              "For each idea estimate whether it would increase landed cost, selling price, complexity or compliance risk.",
+              "Reject cosmetic differences that do not solve a meaningful customer problem.",
+              "Write one clear customer-facing proposition: 'For customers frustrated by X, this product does Y differently.'",
+            ],
+          },
+          {
+            kind: "explain",
+            heading: "Explain back",
+            items: [
+              "Explain why 'different' is not the same as 'better', and why a feature only matters if the customer values it enough to influence purchase.",
+            ],
+          },
+          {
+            kind: "checkpoint",
+            heading: "Checkpoint",
+            items: [],
+            checkpointPrompt:
+              "State your strongest proposed differentiation in one sentence, the review evidence behind it, and what proof you would still need before investing.",
+          },
+        ],
+      },
+      {
+        night: 4,
+        title: "Validate the differentiation — or kill the idea",
+        steps: [
+          {
+            kind: "watch",
+            heading: "Read",
+            items: [
+              "Review the Week 2 rejection mindset: the goal is not to rescue an idea simply because time has already been spent researching it.",
+            ],
+          },
+          {
+            kind: "do",
+            heading: "Do",
+            items: [
+              "Stress-test the proposed differentiation against the ten competitors from Night 1.",
+              "Check whether anyone already solves the same problem well.",
+              "Ask whether a competitor could copy the improvement quickly and cheaply.",
+              "Estimate whether the improvement is likely to support the current market price, require a premium, or destroy margin.",
+              "Check for extra size, weight, manufacturing, intellectual-property or compliance risk introduced by the improvement.",
+              "Give the candidate one verdict: SURVIVE, INVESTIGATE FURTHER, or REJECT.",
+            ],
+          },
+          {
+            kind: "explain",
+            heading: "Explain back",
+            items: [
+              "Defend the verdict as if you were asking someone else to put their own cash into the product.",
+            ],
+          },
+          {
+            kind: "checkpoint",
+            heading: "Checkpoint",
+            items: [],
+            checkpointPrompt:
+              "Give the product a SURVIVE, INVESTIGATE FURTHER or REJECT verdict. State the strongest reason for the decision and the single biggest unresolved risk.",
+          },
+        ],
+      },
+    ],
+    examPrompt:
+      "Produce a one-page competitive opportunity brief for one Week 2 survivor. Include: the primary keyword, ten-competitor market view, price/review range, dominant brands, three recurring review themes, the strongest proposed differentiation, why customers should care, likely copyability, biggest commercial risk, and a final SURVIVE / INVESTIGATE FURTHER / REJECT recommendation.",
+    passStandard:
+      "The recommendation must be traceable to competitor and review evidence. A strong answer distinguishes recurring customer problems from isolated complaints, avoids cosmetic differentiation, identifies reasons the idea could fail, and is willing to recommend REJECT.",
+  },
   { n: 4, slug: "week-4", title: "Unit economics and cash", goal: "Be able to kill a high-revenue idea because the economics are bad.", status: "planned" },
   { n: 5, slug: "week-5", title: "Suppliers, sourcing, samples and negotiation", goal: "Understand that the cheapest quote is not necessarily the cheapest supplier.", status: "planned" },
   { n: 6, slug: "week-6", title: "Freight, import VAT, duty and landed cost", goal: "Make landed cost real.", status: "planned" },

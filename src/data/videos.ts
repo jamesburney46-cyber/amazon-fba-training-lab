@@ -11,9 +11,9 @@
 // curated in Issue #30 "Week 1–2 missing-video curation — 24 Aug 2026"
 // (comment 5402399452).
 //
-// In this phase only Week 1 and Week 2 carry nightly content, so only
-// those weeks have video entries — do not add Weeks 3–12 entries here
-// until their nightly content is built.
+// Weeks 1–3 now carry nightly content. Weeks 1–2 currently have curated
+// embedded video entries; Week 3 video curation is the next content pass.
+// Do not fabricate thumbnails or video IDs for weeks without curated sources.
 //
 // One primary embedded video per instructional night. Week 1/2 Night 5 are
 // exam nights and intentionally carry no compulsory video.

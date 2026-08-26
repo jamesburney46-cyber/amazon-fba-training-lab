@@ -88,7 +88,7 @@ const nextLesson = currentWeek.lessons?.[0];
         <ProgressBar value={0} label="Programme complete (12 weeks)" />
       </div>
       <p class="dashboard-note">
-        Overall programme progress. Weeks 3–12 are planned but not yet open,
+        Overall programme progress. Weeks 4–12 are planned but not yet open,
         so progress can only reach the Week 1–2 portion of the programme in
         this release.
       </p>
@@ -286,7 +286,7 @@ const nextLesson = currentWeek.lessons?.[0];
       if (nextLessonTitle) nextLessonTitle.textContent = complete ? "Every built lesson is complete" : "Nothing open yet";
       if (nextLessonBody) {
         nextLessonBody.textContent = complete
-          ? "Weeks 3–12 open in a later phase. Revisit any lesson or keep practising in the Research Machine."
+          ? "Weeks 4–12 open in a later phase. Revisit any lesson or keep practising in the Research Machine."
           : "Check back once the next week opens.";
       }
       if (nextLessonBtn instanceof HTMLAnchorElement) {
