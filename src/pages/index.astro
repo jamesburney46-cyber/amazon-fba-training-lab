@@ -136,7 +136,7 @@ const funnel = [
       </p>
       <div class="grid grid--4">
         {pillars.map((p, i) => (
-          <Card>
+          <Card class={`pillar-card pillar-card--${i + 1}`}>
             <p class="pillar__index">{String(i + 1).padStart(2, "0")}</p>
             <h3>{p.title}</h3>
             <p>{p.body}</p>
@@ -691,6 +691,149 @@ const funnel = [
 
   .hero__progress-cta:hover {
     background: var(--accent-400);
+  }
+
+
+  /* ------------------------------------------------------------------
+     Controlled colour hierarchy
+     Dark premium base stays intact; colour is reserved for navigation,
+     learning states and decision points.
+     ------------------------------------------------------------------ */
+
+  .pillar-card {
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .pillar-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--pillar-accent);
+  }
+
+  .pillar-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(
+      in srgb,
+      var(--pillar-accent) 48%,
+      var(--border-default)
+    );
+    box-shadow:
+      0 16px 36px rgba(0, 0, 0, 0.24),
+      0 0 28px color-mix(in srgb, var(--pillar-accent) 10%, transparent);
+  }
+
+  .pillar-card .pillar__index {
+    color: var(--pillar-accent);
+  }
+
+  .pillar-card h3 {
+    color: color-mix(in srgb, var(--pillar-accent) 25%, var(--text-primary));
+  }
+
+  /* Watch — blue */
+  .pillar-card--1 {
+    --pillar-accent: #60a5fa;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, #60a5fa 7%, transparent),
+        transparent 48%
+      ),
+      var(--bg-surface);
+  }
+
+  /* Do — green */
+  .pillar-card--2 {
+    --pillar-accent: #34d399;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, #34d399 7%, transparent),
+        transparent 48%
+      ),
+      var(--bg-surface);
+  }
+
+  /* Explain back — purple */
+  .pillar-card--3 {
+    --pillar-accent: #a78bfa;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, #a78bfa 7%, transparent),
+        transparent 48%
+      ),
+      var(--bg-surface);
+  }
+
+  /* Checkpoint — gold */
+  .pillar-card--4 {
+    --pillar-accent: #f5b942;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, #f5b942 7%, transparent),
+        transparent 48%
+      ),
+      var(--bg-surface);
+  }
+
+  /* Give the hero-side card a little more visual importance. */
+  .hero__panel {
+    position: relative;
+    overflow: hidden;
+    border-color: color-mix(
+      in srgb,
+      var(--accent-400) 25%,
+      var(--border-default)
+    );
+  }
+
+  .hero__panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      #60a5fa,
+      #34d399 38%,
+      #a78bfa 70%,
+      #f5b942
+    );
+    opacity: 0.9;
+  }
+
+  .hero__panel-kicker {
+    color: #93b9ff;
+  }
+
+  /* Slightly stronger section navigation labels. */
+  .section h2 {
+    letter-spacing: -0.015em;
+  }
+
+  .section:nth-of-type(2) .section__lede {
+    border-left: 2px solid #60a5fa;
+    padding-left: var(--space-4);
+  }
+
+  /* Main CTA gets a restrained blue glow rather than a louder colour. */
+  .hero__actions .btn--primary {
+    box-shadow: 0 8px 26px color-mix(in srgb, var(--accent-500) 22%, transparent);
+  }
+
+  /* Keep BETA / decision colours deliberately warm. */
+  .funnel__badge--decision,
+  .hero__funnel-badge--decision {
+    box-shadow: 0 0 20px color-mix(in srgb, #f5b942 14%, transparent);
   }
 
 </style>
