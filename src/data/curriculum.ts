@@ -251,7 +251,7 @@ export const weeks: Week[] = [
             kind: "watch",
             heading: "Watch / read",
             items: [
-              "Review a structured Amazon competitor-analysis walkthrough.",
+              "Watch the curated Orange Klik competitor-analysis session.",
               "Focus on market shape rather than simply counting how many sellers exist.",
             ],
           },
@@ -289,7 +289,8 @@ export const weeks: Week[] = [
             kind: "watch",
             heading: "Watch / read",
             items: [
-              "Review a practical walkthrough of using competitor reviews as product-research evidence.",
+              "Read Amazon's own guidance on review highlights and recurring customer-review themes.",
+              "Then manually inspect competitor reviews rather than relying on an automated summary alone.",
               "Pay particular attention to recurring complaints rather than isolated bad reviews.",
             ],
           },
@@ -328,7 +329,7 @@ export const weeks: Week[] = [
             kind: "watch",
             heading: "Watch / read",
             items: [
-              "Review examples of product differentiation that change customer value rather than merely changing colour, logo or packaging.",
+              "Watch the curated product-differentiation lesson covering practical ways to create meaningful customer value rather than merely changing colour, logo or packaging.",
             ],
           },
           {
@@ -366,7 +367,8 @@ export const weeks: Week[] = [
             kind: "watch",
             heading: "Read",
             items: [
-              "Review the Week 2 rejection mindset: the goal is not to rescue an idea simply because time has already been spent researching it.",
+              "Watch the curated product-validation workshop again, this time specifically testing the proposed differentiation.",
+              "Remember the Week 2 rejection mindset: the goal is not to rescue an idea simply because time has already been spent researching it.",
             ],
           },
           {

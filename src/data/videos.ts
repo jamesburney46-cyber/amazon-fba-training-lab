@@ -11,9 +11,10 @@
 // curated in Issue #30 "Week 1–2 missing-video curation — 24 Aug 2026"
 // (comment 5402399452).
 //
-// Weeks 1–3 now carry nightly content. Weeks 1–2 currently have curated
-// embedded video entries; Week 3 video curation is the next content pass.
-// Do not fabricate thumbnails or video IDs for weeks without curated sources.
+// Weeks 1–3 carry nightly content and curated embedded videos where a
+// useful genuine YouTube source exists. Some nights intentionally use
+// authoritative reading/manual exercises instead of forcing a weak video.
+// Do not fabricate thumbnails or video IDs for future weeks.
 //
 // One primary embedded video per instructional night. Week 1/2 Night 5 are
 // exam nights and intentionally carry no compulsory video.
@@ -92,6 +93,30 @@ export const lessonVideos: LessonVideo[] = [
     source: "third-party",
     note: "~55:17 current validation workshop covering demand, competition, pricing/PPC, budget, Amazon Product Opportunity Explorer, market fit and competitor reverse engineering before inventory investment, for Night 4.",
     week: 2,
+    night: 4,
+  },
+  {
+    youtubeId: "S_jBtzXmf4U",
+    title: "Orange Klik — How to Conduct Amazon FBA Competitor Analysis Using AI Tools",
+    source: "third-party",
+    note: "Deep competitor-analysis session covering listings, images, reviews, customer avatars and differentiation. Reused intentionally for Week 3 Night 1 because this week applies the analysis in much greater depth.",
+    week: 3,
+    night: 1,
+  },
+  {
+    youtubeId: "-c4vVigJhyQ",
+    title: "Sharon Even — 5 Ways to Differentiate Your Products for Amazon FBA",
+    source: "third-party",
+    note: "Detailed differentiation lesson covering competitor knowledge, buyer avatars and five practical routes to meaningful product differentiation for Week 3 Night 3.",
+    week: 3,
+    night: 3,
+  },
+  {
+    youtubeId: "WZyE-dNZPyY",
+    title: "Orange Klik — How to Validate Amazon FBA Product Ideas Before You Invest",
+    source: "third-party",
+    note: "Validation workshop reused for Week 3 Night 4 to stress-test whether proposed differentiation genuinely improves the investment case or whether the product should be rejected.",
+    week: 3,
     night: 4,
   },
 ];
