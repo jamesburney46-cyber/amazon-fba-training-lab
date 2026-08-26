@@ -5,6 +5,7 @@ import Button from "@/components/Button.astro";
 import Badge from "@/components/Badge.astro";
 import Callout from "@/components/Callout.astro";
 import VideoThumb from "@/components/VideoThumb.astro";
+import ProgressBar from "@/components/ProgressBar.astro";
 import { getWeekPreviewVideo } from "@/data/videos";
 import { url } from "@/lib/paths";
 
@@ -79,7 +80,7 @@ const funnel = [
         </p>
       </div>
 
-      <aside class="hero__panel" aria-label="How the research machine narrows ideas">
+      <aside class="hero__panel" aria-label="How the research machine narrows ideas" data-auth-signed-out>
         <p class="hero__panel-kicker">The research machine, at a glance</p>
         <ol class="hero__funnel">
           <li><span class="hero__funnel-badge">A</span><span>30 raw ideas</span></li>
@@ -95,6 +96,33 @@ const funnel = [
           Most ideas are rejected before anyone's time is spent on them —
           that discipline is the product.
         </p>
+      </aside>
+
+      <aside class="hero__panel hero__progress" data-home-progress data-auth-signed-in hidden aria-label="Your training progress">
+        <p class="hero__panel-kicker">Your training progress</p>
+
+        <div class="hero__progress-position">
+          <span>Where you are</span>
+          <strong data-home-position>Loading your progress…</strong>
+        </div>
+
+        <div data-home-progressbar>
+          <ProgressBar value={0} label="Programme complete" />
+        </div>
+
+        <p class="hero__progress-count" data-home-progress-count>
+          Loading lesson progress…
+        </p>
+
+        <div class="hero__next">
+          <span class="hero__next-label">Next lesson</span>
+          <strong data-home-next-title>Loading…</strong>
+          <span data-home-next-meta></span>
+        </div>
+
+        <a class="hero__progress-cta" data-home-next-link href={url("/dashboard/")}>
+          Continue training
+        </a>
       </aside>
     </div>
   </section>
@@ -244,6 +272,102 @@ const funnel = [
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  import { getCurrentSession, getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
+  import { getAllLessons, weeks } from "@/data/curriculum";
+  import { url } from "@/lib/paths";
+
+  async function loadHomeProgress() {
+    if (!isSupabaseConfigured) return;
+
+    const supabase = getSupabaseClient();
+    const session = await getCurrentSession();
+
+    if (!supabase || !session?.user) return;
+
+    const userId = session.user.id;
+
+    const { data: rows } = await supabase
+      .from("lesson_progress")
+      .select("week_slug, lesson_slug, status, checkpoint_answer")
+      .eq("user_id", userId);
+
+    const progressRows = rows ?? [];
+    const allLessons = getAllLessons();
+
+    const completedKeys = new Set(
+      progressRows
+        .filter((r) => r.status === "complete")
+        .map((r) => `${r.week_slug}:${r.lesson_slug}`)
+    );
+
+    const completeCount = allLessons.filter((lesson) =>
+      completedKeys.has(`${lesson.weekSlug}:night-${lesson.night}`)
+    ).length;
+
+    const totalCount = allLessons.length;
+    const pct = totalCount > 0
+      ? Math.round((completeCount / totalCount) * 100)
+      : 0;
+
+    const nextLesson = allLessons.find(
+      (lesson) => !completedKeys.has(`${lesson.weekSlug}:night-${lesson.night}`)
+    );
+
+    const position = document.querySelector("[data-home-position]");
+    const count = document.querySelector("[data-home-progress-count]");
+    const nextTitle = document.querySelector("[data-home-next-title]");
+    const nextMeta = document.querySelector("[data-home-next-meta]");
+    const nextLink = document.querySelector("[data-home-next-link]");
+    const progressWrap = document.querySelector("[data-home-progressbar]");
+
+    const fill = progressWrap?.querySelector(".progress__fill");
+    const track = progressWrap?.querySelector(".progress__track");
+    const pctLabel = progressWrap?.querySelectorAll(".progress__label span")[1];
+
+    if (fill instanceof HTMLElement) fill.style.width = `${pct}%`;
+    if (pctLabel) pctLabel.textContent = `${pct}%`;
+    track?.setAttribute("aria-valuenow", String(pct));
+
+    if (count) {
+      count.textContent = `${completeCount} of ${totalCount} lessons complete`;
+    }
+
+    if (nextLesson) {
+      const activeWeek = weeks.find((w) => w.slug === nextLesson.weekSlug);
+
+      if (position) {
+        position.textContent = `Week ${nextLesson.weekN} · Night ${nextLesson.night}`;
+      }
+
+      if (nextTitle) {
+        nextTitle.textContent = nextLesson.lessonTitle;
+      }
+
+      if (nextMeta) {
+        nextMeta.textContent = activeWeek?.title ?? "";
+      }
+
+      if (nextLink instanceof HTMLAnchorElement) {
+        nextLink.href = `${url(`/curriculum/${nextLesson.weekSlug}/`)}#night-${nextLesson.night}`;
+        nextLink.textContent = completeCount > 0 ? "Continue training" : "Start training";
+      }
+    } else {
+      if (position) position.textContent = "All available lessons complete";
+      if (nextTitle) nextTitle.textContent = "You're fully caught up";
+      if (nextMeta) nextMeta.textContent = "Review the curriculum or practise product research.";
+
+      if (nextLink instanceof HTMLAnchorElement) {
+        nextLink.href = url("/curriculum/");
+        nextLink.textContent = "Review curriculum";
+      }
+    }
+  }
+
+  void loadHomeProgress();
+</script>
+
 
 <style>
   .eyebrow {
@@ -505,4 +629,68 @@ const funnel = [
       flex-direction: column;
     }
   }
+
+  .hero__progress-position {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-5);
+  }
+
+  .hero__progress-position span,
+  .hero__next-label {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .hero__progress-position strong {
+    color: var(--text-primary);
+    font-size: var(--text-md);
+  }
+
+  .hero__progress-count {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    margin: var(--space-3) 0 var(--space-5);
+  }
+
+  .hero__next {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+    margin-bottom: var(--space-5);
+  }
+
+  .hero__next strong {
+    color: var(--text-primary);
+    font-size: var(--text-base);
+  }
+
+  .hero__next > span:last-child {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .hero__progress-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    background: var(--accent-500);
+    color: var(--accent-contrast);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+
+  .hero__progress-cta:hover {
+    background: var(--accent-400);
+  }
+
 </style>
