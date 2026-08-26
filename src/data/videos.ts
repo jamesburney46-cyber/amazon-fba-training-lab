@@ -99,3 +99,20 @@ export const lessonVideos: LessonVideo[] = [
 export function getLessonVideos(week: number, night: number): LessonVideo[] {
   return lessonVideos.filter((v) => v.week === week && v.night === night);
 }
+
+/** True when at least one night in this week has a curated video. */
+export function weekHasVideo(week: number): boolean {
+  return lessonVideos.some((v) => v.week === week);
+}
+
+/**
+ * The earliest-night video for a week, used as a single compact preview
+ * thumbnail on the week card in the curriculum/journey view. Returns
+ * undefined for weeks with no curated video — callers must not fabricate
+ * a thumbnail in that case.
+ */
+export function getWeekPreviewVideo(week: number): LessonVideo | undefined {
+  return lessonVideos
+    .filter((v) => v.week === week)
+    .sort((a, b) => a.night - b.night)[0];
+}

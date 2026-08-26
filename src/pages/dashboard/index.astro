@@ -2,6 +2,11 @@
 // Learner dashboard — course progress, current week, next lesson, recent
 // work. Deliberately NOT a business/sales/PPC KPI dashboard: this product
 // tracks training progress and research-practice output only.
+//
+// The header/progress-panel/stat-row below render an honest zero/demo
+// default at build time. For a real signed-in learner, the <script> at the
+// bottom overwrites every number here from that learner's actual
+// `profiles` + `lesson_progress` rows — never sample/demo progress.
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/Card.astro";
 import StatTile from "@/components/StatTile.astro";
@@ -35,7 +40,7 @@ const nextLesson = currentWeek.lessons?.[0];
 
   <header class="page-head">
     <p class="eyebrow">Your training</p>
-    <h1>Welcome back</h1>
+    <h1 id="welcome-heading">Welcome back</h1>
     <p class="page-head__lede">
       Here's where your training and research practice stands. This tracks
       your own progress through the programme — it does not show live
@@ -43,8 +48,28 @@ const nextLesson = currentWeek.lessons?.[0];
     </p>
   </header>
 
+  <div id="progress-panel" hidden>
+    <Card class="progress-panel">
+      <div class="progress-panel__top">
+        <div class="progress-panel__info">
+          <p class="progress-panel__eyebrow">Where you are</p>
+          <p class="progress-panel__position" id="progress-position">Loading your progress&hellip;</p>
+          <div data-progress="programme-top">
+            <ProgressBar value={0} label="Programme complete" />
+          </div>
+          <p class="progress-panel__count" id="progress-count"></p>
+        </div>
+        <Button href={url("/curriculum/")} size="md" id="continue-training-btn">
+          Continue training
+        </Button>
+      </div>
+    </Card>
+  </div>
+
   <div class="stat-row">
-    <StatTile label="Current week" value={`Week ${currentWeek.n}`} hint={currentWeek.title} featured />
+    <div data-stat="current-week">
+      <StatTile label="Current week" value={`Week ${currentWeek.n}`} hint={currentWeek.title} featured />
+    </div>
     <div data-stat="lessons-complete">
       <StatTile label="Lessons complete" value="0 / 5" hint="This week" />
     </div>
@@ -76,10 +101,10 @@ const nextLesson = currentWeek.lessons?.[0];
       <h2>Next lesson</h2>
       {nextLesson && (
         <>
-          <p class="next-lesson__meta">Week {currentWeek.n} · Night {nextLesson.night}</p>
-          <h3>{nextLesson.title}</h3>
-          <p>Follow Watch → Do → Explain Back → Checkpoint, then save your checkpoint answer.</p>
-          <Button href={url(`/curriculum/${currentWeek.slug}/`)} size="sm">
+          <p class="next-lesson__meta" id="next-lesson-meta">Week {currentWeek.n} · Night {nextLesson.night}</p>
+          <h3 id="next-lesson-title">{nextLesson.title}</h3>
+          <p data-next-lesson-body>Follow Watch → Do → Explain Back → Checkpoint, then save your checkpoint answer.</p>
+          <Button href={url(`/curriculum/${currentWeek.slug}/`)} size="sm" id="next-lesson-btn">
             Start this lesson
           </Button>
         </>
@@ -112,11 +137,20 @@ const nextLesson = currentWeek.lessons?.[0];
 
 <script>
   import { getCurrentSession, getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
-  import { weeks } from "@/data/curriculum";
+  import { weeks, getAllLessons, type FlatLesson } from "@/data/curriculum";
+  import { url } from "@/lib/paths";
 
   const demoBanner = document.getElementById("demo-banner");
   const signedOutBanner = document.getElementById("signed-out-banner");
-  const currentWeek = weeks[0];
+  const progressPanel = document.getElementById("progress-panel");
+  const welcomeHeading = document.getElementById("welcome-heading");
+  const progressPosition = document.getElementById("progress-position");
+  const progressCount = document.getElementById("progress-count");
+  const continueBtn = document.getElementById("continue-training-btn");
+  const nextLessonMeta = document.getElementById("next-lesson-meta");
+  const nextLessonTitle = document.getElementById("next-lesson-title");
+  const nextLessonBody = document.querySelector<HTMLElement>("[data-next-lesson-body]");
+  const nextLessonBtn = document.getElementById("next-lesson-btn");
 
   function setStat(key: string, value: string, hint?: string) {
     const wrap = document.querySelector(`[data-stat="${key}"]`);
@@ -129,14 +163,19 @@ const nextLesson = currentWeek.lessons?.[0];
     }
   }
 
-  function setProgress(pct: number) {
-    const wrap = document.querySelector('[data-progress="programme"]');
+  function setProgress(key: string, pct: number) {
+    const wrap = document.querySelector(`[data-progress="${key}"]`);
     const fill = wrap?.querySelector<HTMLElement>(".progress__fill");
     const track = wrap?.querySelector(".progress__track");
     const pctLabel = wrap?.querySelectorAll(".progress__label span")[1];
     if (fill) fill.style.width = `${pct}%`;
     if (pctLabel) pctLabel.textContent = `${pct}%`;
     track?.setAttribute("aria-valuenow", String(pct));
+  }
+
+  /** Base-path-aware link to a specific lesson, deep-linked to its anchor on the week page. */
+  function lessonHref(lesson: FlatLesson): string {
+    return `${url(`/curriculum/${lesson.weekSlug}/`)}#night-${lesson.night}`;
   }
 
   async function run() {
@@ -153,19 +192,44 @@ const nextLesson = currentWeek.lessons?.[0];
     }
     const userId = session.user.id;
 
-    const [{ data: progressRows }, { data: candidateRows }] = await Promise.all([
+    const [{ data: progressRows }, { data: candidateRows }, { data: profileRow }] = await Promise.all([
       supabase
         .from("lesson_progress")
         .select("week_slug, lesson_slug, status, checkpoint_answer, updated_at")
         .eq("user_id", userId),
       supabase.from("research_candidates").select("id").eq("user_id", userId),
+      supabase.from("profiles").select("display_name").eq("id", userId).maybeSingle(),
     ]);
 
     const rows = progressRows ?? [];
-    const currentWeekRows = rows.filter((r) => r.week_slug === currentWeek.slug);
+
+    // Real next-incomplete-lesson calculation: walk every lesson across
+    // every currently-built week in curriculum order (Week 1 Night 1,
+    // Week 1 Night 2, … Week 2 Night 4) and return the first one that does
+    // not have a `lesson_progress` row with status "complete" for this
+    // learner. `undefined` (all built lessons complete) is a clean,
+    // distinct state — not an error.
+    const allLessons = getAllLessons();
+    const completedKeys = new Set(
+      rows.filter((r) => r.status === "complete").map((r) => `${r.week_slug}:${r.lesson_slug}`)
+    );
+    const nextLesson = allLessons.find((l) => !completedKeys.has(`${l.weekSlug}:night-${l.night}`));
+    const totalLessonsProgramme = allLessons.length;
+    const completeProgramme = allLessons.filter((l) =>
+      completedKeys.has(`${l.weekSlug}:night-${l.night}`)
+    ).length;
+    const pct = totalLessonsProgramme > 0 ? Math.round((completeProgramme / totalLessonsProgramme) * 100) : 0;
+
+    // "This week" for the stat row is wherever the learner actually is —
+    // the week of their next incomplete lesson, or the last built week if
+    // every built lesson is already complete — not always Week 1.
+    const activeWeekSlug = nextLesson?.weekSlug ?? allLessons[allLessons.length - 1]?.weekSlug;
+    const activeWeek = weeks.find((w) => w.slug === activeWeekSlug) ?? weeks[0];
+    const currentWeekRows = rows.filter((r) => r.week_slug === activeWeek.slug);
     const completeThisWeek = currentWeekRows.filter((r) => r.status === "complete").length;
-    const totalLessonsThisWeek = currentWeek.lessons?.length ?? 0;
+    const totalLessonsThisWeek = activeWeek.lessons?.length ?? 0;
     setStat("lessons-complete", `${completeThisWeek} / ${totalLessonsThisWeek}`, "This week");
+    setStat("current-week", `Week ${activeWeek.n}`, activeWeek.title);
 
     const checkpointsSaved = rows.filter((r) => r.checkpoint_answer && r.checkpoint_answer.trim().length > 0).length;
     setStat("checkpoints-saved", String(checkpointsSaved), "Saved to your account");
@@ -173,10 +237,63 @@ const nextLesson = currentWeek.lessons?.[0];
     const candidateCount = (candidateRows ?? []).length;
     setStat("research-candidates", String(candidateCount), "In the Product Research Machine");
 
-    const totalLessonsProgramme = weeks.reduce((sum, w) => sum + (w.lessons?.length ?? 0), 0);
-    const completeProgramme = rows.filter((r) => r.status === "complete").length;
-    const pct = totalLessonsProgramme > 0 ? Math.round((completeProgramme / totalLessonsProgramme) * 100) : 0;
-    setProgress(pct);
+    setProgress("programme", pct);
+    setProgress("programme-top", pct);
+
+    // Personalised welcome heading — real `profiles.display_name`, never a
+    // fabricated/sample name. Falls back to the generic heading if the
+    // learner hasn't set one.
+    const displayName = (profileRow?.display_name ?? "").trim();
+    if (welcomeHeading) {
+      welcomeHeading.textContent = displayName ? `Welcome back, ${displayName}` : "Welcome back";
+    }
+
+    if (progressCount) {
+      progressCount.textContent = `${completeProgramme} of ${totalLessonsProgramme} lessons complete (${pct}%)`;
+    }
+
+    if (nextLesson) {
+      if (progressPosition) {
+        progressPosition.textContent = `Week ${nextLesson.weekN} · Night ${nextLesson.night} — ${nextLesson.lessonTitle}`;
+      }
+      if (continueBtn instanceof HTMLAnchorElement) {
+        continueBtn.href = lessonHref(nextLesson);
+        continueBtn.textContent = "Continue training";
+      }
+      if (nextLessonMeta) nextLessonMeta.textContent = `Week ${nextLesson.weekN} · Night ${nextLesson.night}`;
+      if (nextLessonTitle) nextLessonTitle.textContent = nextLesson.lessonTitle;
+      if (nextLessonBody) {
+        nextLessonBody.textContent = "Follow Watch → Do → Explain Back → Checkpoint, then save your checkpoint answer.";
+      }
+      if (nextLessonBtn instanceof HTMLAnchorElement) {
+        nextLessonBtn.href = lessonHref(nextLesson);
+        nextLessonBtn.textContent = "Start this lesson";
+      }
+    } else {
+      // Fully-complete state (or, if somehow no lessons are built yet, the
+      // zero-lessons state) — both are clean, honest end states, not bugs.
+      const complete = totalLessonsProgramme > 0;
+      if (progressPosition) {
+        progressPosition.textContent = complete
+          ? "You've completed every lesson available so far — nicely done."
+          : "No lessons are open yet.";
+      }
+      if (continueBtn instanceof HTMLAnchorElement) {
+        continueBtn.href = url("/curriculum/");
+        continueBtn.textContent = "Review curriculum";
+      }
+      if (nextLessonMeta) nextLessonMeta.textContent = complete ? "All caught up" : "";
+      if (nextLessonTitle) nextLessonTitle.textContent = complete ? "Every built lesson is complete" : "Nothing open yet";
+      if (nextLessonBody) {
+        nextLessonBody.textContent = complete
+          ? "Weeks 3–12 open in a later phase. Revisit any lesson or keep practising in the Research Machine."
+          : "Check back once the next week opens.";
+      }
+      if (nextLessonBtn instanceof HTMLAnchorElement) {
+        nextLessonBtn.href = url("/curriculum/");
+        nextLessonBtn.textContent = "Review curriculum";
+      }
+    }
 
     const recentWork = document.querySelector("[data-recent-work]");
     if (recentWork) {
@@ -193,6 +310,8 @@ const nextLesson = currentWeek.lessons?.[0];
           ? `${candidateCount} candidate${candidateCount === 1 ? "" : "s"} saved to your account.`
           : "No candidates saved yet. Run an idea through the Product Research Machine to build your first candidate card.";
     }
+
+    if (progressPanel) progressPanel.hidden = false;
   }
 
   void run();
@@ -212,6 +331,39 @@ const nextLesson = currentWeek.lessons?.[0];
   }
   .page-head__lede {
     max-width: 62ch;
+  }
+  .progress-panel {
+    margin-bottom: var(--space-8);
+    border-color: color-mix(in srgb, var(--gold-500) 35%, var(--border-subtle));
+  }
+  .progress-panel__top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+  .progress-panel__info {
+    flex: 1;
+    min-width: 0;
+  }
+  .progress-panel__eyebrow {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--gold-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .progress-panel__position {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+  }
+  .progress-panel__count {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
   }
   .stat-row {
     display: grid;
@@ -250,6 +402,12 @@ const nextLesson = currentWeek.lessons?.[0];
     }
     .dashboard-grid {
       grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .progress-panel__top {
+      flex-direction: column;
+      align-items: stretch;
     }
   }
   @media (max-width: 560px) {

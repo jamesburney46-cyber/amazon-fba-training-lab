@@ -1,0 +1,59 @@
+---
+// Small, restrained 16:9 video preview thumbnail for journey/curriculum
+// cards — deliberately not a full VideoEmbed. Used only on week/lesson
+// cards that actually carry a curated video (see src/data/videos.ts);
+// callers must not render this for lessons without one.
+//
+// Uses YouTube's own thumbnail CDN for the already-curated video ID, so no
+// thumbnail image is invented or hosted here.
+interface Props {
+  youtubeId: string;
+  title: string;
+  class?: string;
+}
+const { youtubeId, title, class: className = "" } = Astro.props;
+const thumbSrc = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+---
+
+<span class:list={["video-thumb", className]}>
+  <img src={thumbSrc} alt="" loading="lazy" width="120" height="68" />
+  <svg class="video-thumb__play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <circle cx="12" cy="12" r="12" />
+    <path d="M9.5 7.5v9l8-4.5z" />
+  </svg>
+  <span class="visually-hidden">Video preview: {title}</span>
+</span>
+
+<style>
+  .video-thumb {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+  .video-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .video-thumb__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    transform: translate(-50%, -50%);
+  }
+  .video-thumb__play circle {
+    fill: rgba(7, 10, 15, 0.6);
+  }
+  .video-thumb__play path {
+    fill: #fff;
+  }
+</style>

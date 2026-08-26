@@ -251,3 +251,32 @@ export const weeks: Week[] = [
 export function getWeek(slug: string): Week | undefined {
   return weeks.find((w) => w.slug === slug);
 }
+
+/** A single lesson flattened with its parent week's identity, in curriculum order. */
+export type FlatLesson = {
+  weekSlug: string;
+  weekN: number;
+  weekTitle: string;
+  night: number;
+  lessonTitle: string;
+};
+
+/**
+ * Every lesson across every currently-built week, in curriculum order.
+ * Weeks 3–12 are "planned" (no `lessons` array yet) and are naturally
+ * skipped — this only ever reflects real, currently-open content, never
+ * invented future weeks. Used to compute a signed-in learner's next
+ * incomplete lesson and total programme size from real `lesson_progress`
+ * rows.
+ */
+export function getAllLessons(): FlatLesson[] {
+  return weeks.flatMap((w) =>
+    (w.lessons ?? []).map((l) => ({
+      weekSlug: w.slug,
+      weekN: w.n,
+      weekTitle: w.title,
+      night: l.night,
+      lessonTitle: l.title,
+    }))
+  );
+}

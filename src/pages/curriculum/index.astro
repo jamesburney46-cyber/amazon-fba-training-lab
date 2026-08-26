@@ -2,7 +2,9 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/Card.astro";
 import Callout from "@/components/Callout.astro";
+import VideoThumb from "@/components/VideoThumb.astro";
 import { weeks } from "@/data/curriculum";
+import { getWeekPreviewVideo } from "@/data/videos";
 import { url } from "@/lib/paths";
 ---
 
@@ -23,22 +25,32 @@ import { url } from "@/lib/paths";
   </Callout>
 
   <ol class="week-list">
-    {weeks.map((w) => (
-      <li>
-        <Card class="week-card" padded={false}>
-          <a class="week-card__link" href={url(`/curriculum/${w.slug}/`)}>
-            <div class="week-card__head">
-              <span class="week-card__number">Week {w.n}</span>
-              <span class:list={["week-card__status", { "week-card__status--planned": w.status === "planned" }]}>
-                {w.status === "live" ? "Available" : "Planned"}
-              </span>
-            </div>
-            <h2>{w.title}</h2>
-            <p>{w.goal}</p>
-          </a>
-        </Card>
-      </li>
-    ))}
+    {weeks.map((w) => {
+      const previewVideo = getWeekPreviewVideo(w.n);
+      return (
+        <li>
+          <Card class="week-card" padded={false}>
+            <a class="week-card__link" href={url(`/curriculum/${w.slug}/`)}>
+              <div class="week-card__head">
+                <span class="week-card__number">Week {w.n}</span>
+                <span class:list={["week-card__status", { "week-card__status--planned": w.status === "planned" }]}>
+                  {w.status === "live" ? "Available" : "Planned"}
+                </span>
+              </div>
+              {previewVideo && (
+                <VideoThumb
+                  youtubeId={previewVideo.youtubeId}
+                  title={previewVideo.title}
+                  class="week-card__thumb"
+                />
+              )}
+              <h2>{w.title}</h2>
+              <p>{w.goal}</p>
+            </a>
+          </Card>
+        </li>
+      );
+    })}
   </ol>
 </AppLayout>
 
@@ -83,6 +95,10 @@ import { url } from "@/lib/paths";
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: var(--space-3);
+  }
+  .week-card__thumb {
+    width: 96px;
     margin-bottom: var(--space-3);
   }
   .week-card__number {
