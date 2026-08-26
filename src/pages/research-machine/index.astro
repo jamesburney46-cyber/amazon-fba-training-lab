@@ -19,7 +19,7 @@ const stageLabels: Record<string, string> = {
 >
   <header class="page-head">
     <p class="eyebrow">Practice tool</p>
-    <h1>Product Research Machine</h1>
+    <h1>Product Research Machine <span class="beta-pill">Beta</span></h1>
     <p class="page-head__lede">
       Add candidate product ideas and move them through the same funnel used
       to turn 30 raw ideas into a maximum of three defensible candidates.
@@ -27,6 +27,14 @@ const stageLabels: Record<string, string> = {
       connected; you are practising the discipline of rejection.
     </p>
   </header>
+
+  <Callout tone="warning" title="Beta — this workflow is still being refined">
+    The Product Research Machine is under active development. Stages, fields
+    and scoring may change as the tool is refined, and it is not yet a
+    finished production feature. Any real candidates you add and save here
+    stay private to you — either to your signed-in account, or to this
+    browser if you are not signed in — nobody else can see them.
+  </Callout>
 
   <div id="demo-banner" hidden>
     <Callout tone="warning" title="Demo mode — no Supabase project connected">
@@ -75,6 +83,58 @@ const stageLabels: Record<string, string> = {
         {researchDiscipline.avoid.map((a) => <li>{a}</li>)}
       </ul>
     </div>
+  </section>
+
+  <section class="sample-candidate" data-sample-candidate aria-labelledby="sample-candidate-heading">
+    <div class="sample-candidate__head">
+      <span class="sample-badge">Sample · not your data</span>
+      <h2 id="sample-candidate-heading">EcoFlex Bamboo Travel Cutlery Set</h2>
+    </div>
+    <p class="sample-candidate__blurb">
+      An illustrative, fictional example showing what a candidate looks like
+      once it has been worked through the whole funnel to Stage E. The
+      product, numbers and notes below are realistic placeholders for
+      teaching the flow — they are not real research and are not saved
+      anywhere until you choose to copy the idea onto your own board.
+    </p>
+    <dl class="sample-candidate__facts">
+      <div>
+        <dt>Stage reached</dt>
+        <dd>E · Investment case (illustrative)</dd>
+      </div>
+      <div>
+        <dt>Evidence (Stage C)</dt>
+        <dd>
+          Primary keyword "bamboo travel cutlery set", ~9,000 est. monthly
+          searches; top 10 competitors £14–£24; mixed 3.9★ average with
+          recurring "pieces don't clip together" complaints — a plausible
+          differentiation angle.
+        </dd>
+      </div>
+      <div>
+        <dt>Indicative economics (Stage D)</dt>
+        <dd>
+          Sell price £19.99 · landed unit cost £4.10 · Amazon fees £6.40 ·
+          target CPA £3.50 → contribution ≈ £5.99/unit before overheads.
+        </dd>
+      </div>
+      <div>
+        <dt>Key risk</dt>
+        <dd>
+          Category is crowded with near-identical bamboo sets — needs a
+          verified, defensible differentiation angle before committing cash.
+        </dd>
+      </div>
+      <div>
+        <dt>Recommendation</dt>
+        <dd>INVESTIGATE — evidence is promising but contribution is thin and unverified.</dd>
+      </div>
+    </dl>
+    <div class="sample-candidate__actions">
+      <button type="button" data-copy-sample>Copy idea to Stage A</button>
+      <a href={url("/scorecard/")}>See how this would score →</a>
+    </div>
+    <p class="sample-candidate__note" data-copy-sample-status role="status" aria-live="polite"></p>
   </section>
 
   <section class="board" id="research-board" data-research-board>
@@ -137,6 +197,21 @@ const stageLabels: Record<string, string> = {
   .page-head__lede {
     max-width: 68ch;
   }
+  .beta-pill {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--space-3);
+    padding: 0.15rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--status-investigate);
+    background: var(--status-investigate-tint);
+    border: 1px solid color-mix(in srgb, var(--status-investigate) 35%, transparent);
+    border-radius: var(--radius-full);
+    vertical-align: middle;
+  }
   .funnel-guide {
     margin: var(--space-8) 0;
     display: flex;
@@ -174,6 +249,96 @@ const stageLabels: Record<string, string> = {
   }
   .discipline ul {
     font-size: var(--text-sm);
+  }
+
+  .sample-candidate {
+    border: 1px dashed color-mix(in srgb, var(--status-investigate) 45%, var(--border-default));
+    border-radius: var(--radius-lg);
+    background: var(--status-investigate-tint);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+  .sample-candidate__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+  }
+  .sample-candidate__head h2 {
+    font-size: var(--text-lg);
+    margin: 0;
+  }
+  .sample-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--status-investigate);
+    background: var(--bg-surface);
+    border: 1px solid color-mix(in srgb, var(--status-investigate) 45%, transparent);
+    border-radius: var(--radius-full);
+  }
+  .sample-candidate__blurb {
+    max-width: 72ch;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+  .sample-candidate__facts {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-4) 0;
+  }
+  .sample-candidate__facts div {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+  }
+  .sample-candidate__facts dt {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    margin-bottom: var(--space-1);
+  }
+  .sample-candidate__facts dd {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+  .sample-candidate__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+  .sample-candidate__actions button {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: var(--accent-500);
+    color: var(--accent-contrast);
+    cursor: pointer;
+  }
+  .sample-candidate__actions button:hover {
+    background: var(--accent-400);
+  }
+  .sample-candidate__actions a {
+    font-size: var(--text-sm);
+    color: var(--accent-400);
+  }
+  .sample-candidate__note {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-xs);
+    color: var(--status-go);
+    min-height: 1.2em;
   }
 
   .board {

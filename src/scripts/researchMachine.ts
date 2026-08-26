@@ -28,6 +28,14 @@ const STAGE_CAPS: Record<Stage, number> = {
 };
 const STORAGE_KEY = "fba_lab_research_board_v1";
 
+// Illustrative, fictional example rendered as a static "sample" panel on the
+// page (see src/pages/research-machine/index.astro) — its economics/notes
+// live only in that markup. Copying it here only ever adds a plain Stage A
+// idea by name, through the same addCandidate() path a manually typed idea
+// uses, so it is never written to Supabase (or local storage) unless the
+// learner explicitly clicks "Copy idea to Stage A".
+const SAMPLE_CANDIDATE_NAME = "EcoFlex Bamboo Travel Cutlery Set";
+
 function nextStage(stage: Stage): Stage | null {
   const idx = STAGE_ORDER.indexOf(stage);
   if (idx === -1 || idx === STAGE_ORDER.length - 1) return null;
@@ -83,6 +91,8 @@ export function initResearchMachine(root: HTMLElement) {
   const demoBanner = document.getElementById("demo-banner");
   const signedOutBanner = document.getElementById("signed-out-banner");
   const signedInBanner = document.getElementById("signed-in-banner");
+  const copySampleBtn = document.querySelector<HTMLButtonElement>("[data-copy-sample]");
+  const copySampleStatus = document.querySelector<HTMLElement>("[data-copy-sample-status]");
 
   const state: { candidates: Candidate[]; rejected: Candidate[] } = { candidates: [], rejected: [] };
   const supabase = getSupabaseClient();
@@ -295,6 +305,21 @@ export function initResearchMachine(root: HTMLElement) {
   resetBtn?.addEventListener("click", () => {
     if (!confirm("Clear the whole board? This cannot be undone.")) return;
     void clearBoard();
+  });
+
+  copySampleBtn?.addEventListener("click", async () => {
+    if (!copySampleStatus) return;
+    if (countInStage("raw") >= STAGE_CAPS.raw) {
+      copySampleStatus.textContent =
+        "Stage A is full at 30 raw ideas — reject or advance some before copying the sample.";
+      copySampleStatus.style.color = "var(--status-reject)";
+      return;
+    }
+    await addCandidate(SAMPLE_CANDIDATE_NAME);
+    copySampleStatus.textContent = live
+      ? "Copied to Stage A on your account board below."
+      : "Copied to Stage A on this browser's board below (local storage).";
+    copySampleStatus.style.color = "var(--status-go)";
   });
 
   async function init() {

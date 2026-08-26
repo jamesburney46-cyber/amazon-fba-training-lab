@@ -8,7 +8,7 @@ const { variant = "public" } = Astro.props;
 
 const publicLinks = [
   { href: url("/curriculum/"), label: "Curriculum" },
-  { href: url("/research-machine/"), label: "Product Research Machine" },
+  { href: url("/research-machine/"), label: "Product Research Machine", badge: "Beta" },
   { href: url("/scorecard/"), label: "Scorecard" },
   { href: url("/resources/"), label: "Resources" },
 ];
@@ -16,7 +16,7 @@ const publicLinks = [
 const appLinks = [
   { href: url("/dashboard/"), label: "Dashboard" },
   { href: url("/curriculum/"), label: "Curriculum" },
-  { href: url("/research-machine/"), label: "Research Machine" },
+  { href: url("/research-machine/"), label: "Research Machine", badge: "Beta" },
   { href: url("/scorecard/"), label: "Scorecard" },
   { href: url("/resources/"), label: "Resources" },
   { href: url("/glossary/"), label: "Glossary" },
@@ -35,7 +35,12 @@ const links = variant === "app" ? appLinks : publicLinks;
     <nav class="nav" aria-label="Primary">
       <ul class="nav__list">
         {links.map((link) => (
-          <li><a class="nav__link" href={link.href}>{link.label}</a></li>
+          <li>
+            <a class="nav__link" href={link.href}>
+              {link.label}
+              {link.badge && <span class="nav-badge">{link.badge}</span>}
+            </a>
+          </li>
         ))}
       </ul>
     </nav>
@@ -65,7 +70,12 @@ const links = variant === "app" ? appLinks : publicLinks;
   <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" data-mobile-nav hidden>
     <ul>
       {links.map((link) => (
-        <li><a href={link.href}>{link.label}</a></li>
+        <li>
+          <a href={link.href}>
+            {link.label}
+            {link.badge && <span class="nav-badge">{link.badge}</span>}
+          </a>
+        </li>
       ))}
       <li data-auth-signed-out><a href={url("/auth/sign-in/")}>Sign in</a></li>
       <li data-auth-signed-out><a href={url("/auth/sign-up/")}>Start training</a></li>
@@ -132,6 +142,21 @@ const links = variant === "app" ? appLinks : publicLinks;
   }
   .nav__link:hover {
     color: var(--text-primary);
+  }
+  .nav-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--space-2);
+    padding: 0.05rem 0.45rem;
+    font-size: 0.65rem;
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--status-investigate);
+    background: var(--status-investigate-tint);
+    border: 1px solid color-mix(in srgb, var(--status-investigate) 35%, transparent);
+    border-radius: var(--radius-full);
+    vertical-align: middle;
   }
   .header-actions {
     display: flex;
