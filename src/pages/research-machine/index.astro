@@ -21,19 +21,16 @@ const stageLabels: Record<string, string> = {
     <p class="eyebrow">Practice tool</p>
     <h1>Product Research Machine <span class="beta-pill">Beta</span></h1>
     <p class="page-head__lede">
-      Add candidate product ideas and move them through the same funnel used
-      to turn 30 raw ideas into a maximum of three defensible candidates.
-      This is a practice board — no research tooling or live Amazon data is
-      connected; you are practising the discipline of rejection.
+      The Product Research Machine is being built to turn raw Amazon product
+      ideas into evidence-led investment decisions. Below is an illustrative
+      example of the type of result the finished machine will produce.
     </p>
   </header>
 
-  <Callout tone="warning" title="Beta — this workflow is still being refined">
-    The Product Research Machine is under active development. Stages, fields
-    and scoring may change as the tool is refined, and it is not yet a
-    finished production feature. Any real candidates you add and save here
-    stay private to you — either to your signed-in account, or to this
-    browser if you are not signed in — nobody else can see them.
+  <Callout tone="warning" title="Beta preview">
+    The full research workflow is still under development. This preview shows
+    the kind of completed product opportunity report the finished Research
+    Machine is intended to produce.
   </Callout>
 
   <div id="demo-banner" hidden>
@@ -58,7 +55,7 @@ const stageLabels: Record<string, string> = {
     </Callout>
   </div>
 
-  <section class="funnel-guide">
+  <section class="funnel-guide" hidden>
     {funnelStages.map((stage) => (
       <details class="funnel-guide__item">
         <summary>{stage.title}</summary>
@@ -70,7 +67,7 @@ const stageLabels: Record<string, string> = {
     ))}
   </section>
 
-  <section class="discipline">
+  <section class="discipline" hidden>
     <div>
       <h2>Say this</h2>
       <ul>
@@ -85,59 +82,114 @@ const stageLabels: Record<string, string> = {
     </div>
   </section>
 
-  <section class="sample-candidate" data-sample-candidate aria-labelledby="sample-candidate-heading">
-    <div class="sample-candidate__head">
-      <span class="sample-badge">Sample · not your data</span>
-      <h2 id="sample-candidate-heading">EcoFlex Bamboo Travel Cutlery Set</h2>
+  <section class="result-preview" aria-labelledby="result-preview-heading">
+    <div class="result-preview__top">
+      <div>
+        <span class="sample-badge">Illustrative completed result</span>
+        <p class="result-preview__kicker">Product opportunity report</p>
+        <h2 id="result-preview-heading">EcoFlex Bamboo Travel Cutlery Set</h2>
+        <p class="result-preview__summary">
+          A portable bamboo cutlery kit aimed at eco-conscious commuters,
+          travellers and lunchbox users. The opportunity shows credible demand
+          and a clear customer complaint to solve, but margin and differentiation
+          still need verification before committing cash.
+        </p>
+      </div>
+      <div class="result-preview__score">
+        <span>Opportunity score</span>
+        <strong>74</strong>
+        <small>/ 100</small>
+      </div>
     </div>
-    <p class="sample-candidate__blurb">
-      An illustrative, fictional example showing what a candidate looks like
-      once it has been worked through the whole funnel to Stage E. The
-      product, numbers and notes below are realistic placeholders for
-      teaching the flow — they are not real research and are not saved
-      anywhere until you choose to copy the idea onto your own board.
+
+    <div class="result-preview__visual">
+      <div class="product-mock">
+        <div class="product-mock__case"></div>
+        <div class="product-mock__utensil product-mock__utensil--fork">♜</div>
+        <div class="product-mock__utensil product-mock__utensil--spoon">●</div>
+        <div class="product-mock__utensil product-mock__utensil--knife"></div>
+        <p>EcoFlex</p>
+        <span>Bamboo travel cutlery set</span>
+      </div>
+
+      <div class="result-preview__metrics">
+        <div>
+          <span>Target selling price</span>
+          <strong>£19.99</strong>
+        </div>
+        <div>
+          <span>Estimated landed cost</span>
+          <strong>£4.10</strong>
+        </div>
+        <div>
+          <span>Estimated Amazon fees</span>
+          <strong>£6.40</strong>
+        </div>
+        <div>
+          <span>Target advertising CPA</span>
+          <strong>£3.50</strong>
+        </div>
+        <div class="result-preview__metric--primary">
+          <span>Indicative contribution</span>
+          <strong>£5.99/unit</strong>
+        </div>
+        <div>
+          <span>Primary demand signal</span>
+          <strong>~9,000 searches/mo</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-preview__analysis">
+      <article>
+        <span class="result-preview__label">Demand</span>
+        <h3>Evidence of an active market</h3>
+        <p>
+          Primary keyword demand is estimated at roughly 9,000 monthly searches,
+          with established competitors selling between approximately £14 and £24.
+        </p>
+      </article>
+
+      <article>
+        <span class="result-preview__label">Differentiation</span>
+        <h3>A customer problem worth investigating</h3>
+        <p>
+          Competitor reviews repeatedly mention pieces failing to clip together,
+          creating a plausible product-improvement angle if it can be engineered
+          and protected from easy copying.
+        </p>
+      </article>
+
+      <article>
+        <span class="result-preview__label">Risk</span>
+        <h3>Crowded category and thin economics</h3>
+        <p>
+          Many competing sets look almost identical. The economics are acceptable
+          on paper but leave limited room for price pressure, higher advertising
+          costs or unexpected freight and duty.
+        </p>
+      </article>
+    </div>
+
+    <div class="result-preview__decision">
+      <div>
+        <span>Machine recommendation</span>
+        <strong>INVESTIGATE</strong>
+      </div>
+      <p>
+        Promising enough to continue researching, but not yet strong enough to
+        place an order. Verify demand, supplier economics and a defensible
+        differentiation angle before capital is committed.
+      </p>
+    </div>
+
+    <p class="result-preview__footer">
+      The finished Research Machine will guide a product through rejection,
+      evidence, economics and risk analysis before producing a decision like this.
     </p>
-    <dl class="sample-candidate__facts">
-      <div>
-        <dt>Stage reached</dt>
-        <dd>E · Investment case (illustrative)</dd>
-      </div>
-      <div>
-        <dt>Evidence (Stage C)</dt>
-        <dd>
-          Primary keyword "bamboo travel cutlery set", ~9,000 est. monthly
-          searches; top 10 competitors £14–£24; mixed 3.9★ average with
-          recurring "pieces don't clip together" complaints — a plausible
-          differentiation angle.
-        </dd>
-      </div>
-      <div>
-        <dt>Indicative economics (Stage D)</dt>
-        <dd>
-          Sell price £19.99 · landed unit cost £4.10 · Amazon fees £6.40 ·
-          target CPA £3.50 → contribution ≈ £5.99/unit before overheads.
-        </dd>
-      </div>
-      <div>
-        <dt>Key risk</dt>
-        <dd>
-          Category is crowded with near-identical bamboo sets — needs a
-          verified, defensible differentiation angle before committing cash.
-        </dd>
-      </div>
-      <div>
-        <dt>Recommendation</dt>
-        <dd>INVESTIGATE — evidence is promising but contribution is thin and unverified.</dd>
-      </div>
-    </dl>
-    <div class="sample-candidate__actions">
-      <button type="button" data-copy-sample>Copy idea to Stage A</button>
-      <a href={url("/scorecard/")}>See how this would score →</a>
-    </div>
-    <p class="sample-candidate__note" data-copy-sample-status role="status" aria-live="polite"></p>
   </section>
 
-  <section class="board" id="research-board" data-research-board>
+  <section class="board" id="research-board" data-research-board hidden>
     <div class="board__toolbar">
       <form data-add-form class="board__add">
         <label for="add-input" class="visually-hidden">New candidate idea</label>
@@ -537,4 +589,233 @@ const stageLabels: Record<string, string> = {
       grid-template-columns: 1fr;
     }
   }
+
+  .result-preview {
+    margin: var(--space-8) 0;
+    padding: var(--space-7);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+  }
+
+  .result-preview__top {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-6);
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+  }
+
+  .result-preview__kicker {
+    margin: var(--space-3) 0 var(--space-1);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .result-preview__top h2 {
+    margin: 0 0 var(--space-3);
+  }
+
+  .result-preview__summary {
+    max-width: 68ch;
+  }
+
+  .result-preview__score {
+    min-width: 140px;
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--bg-inset);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .result-preview__score span,
+  .result-preview__score small {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .result-preview__score strong {
+    display: block;
+    font-size: 2.6rem;
+    line-height: 1;
+    margin: var(--space-2) 0;
+    color: var(--status-investigate);
+  }
+
+  .result-preview__visual {
+    display: grid;
+    grid-template-columns: minmax(240px, .8fr) 1.4fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .product-mock {
+    min-height: 310px;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,.16), transparent 34%),
+      linear-gradient(145deg, #b89668, #73573b);
+    border: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-5);
+    color: white;
+  }
+
+  .product-mock__case {
+    position: absolute;
+    width: 70%;
+    height: 42%;
+    left: 15%;
+    top: 20%;
+    border-radius: 999px;
+    background: #d9c29f;
+    box-shadow: 0 18px 45px rgba(0,0,0,.25);
+  }
+
+  .product-mock__utensil {
+    position: absolute;
+    top: 27%;
+    font-size: 2rem;
+    color: #694d32;
+    z-index: 2;
+  }
+
+  .product-mock__utensil--fork { left: 30%; }
+  .product-mock__utensil--spoon { left: 48%; }
+  .product-mock__utensil--knife {
+    left: 66%;
+    width: 8px;
+    height: 90px;
+    background: #694d32;
+    border-radius: 999px;
+  }
+
+  .product-mock p {
+    margin: 0;
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-lg);
+    position: relative;
+  }
+
+  .product-mock span {
+    font-size: var(--text-sm);
+    opacity: .8;
+    position: relative;
+  }
+
+  .result-preview__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .result-preview__metrics > div {
+    padding: var(--space-4);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--bg-inset);
+  }
+
+  .result-preview__metrics span {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-2);
+  }
+
+  .result-preview__metrics strong {
+    font-size: var(--text-lg);
+  }
+
+  .result-preview__metric--primary {
+    border-color: color-mix(in srgb, var(--status-go) 40%, var(--border-subtle)) !important;
+  }
+
+  .result-preview__analysis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .result-preview__analysis article {
+    padding: var(--space-5);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .result-preview__analysis h3 {
+    font-size: var(--text-base);
+    margin: var(--space-2) 0;
+  }
+
+  .result-preview__analysis p {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .result-preview__label {
+    color: var(--accent-400);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .result-preview__decision {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: var(--space-5);
+    align-items: center;
+    padding: var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--status-investigate-tint);
+    border: 1px solid color-mix(in srgb, var(--status-investigate) 35%, transparent);
+  }
+
+  .result-preview__decision span {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-1);
+  }
+
+  .result-preview__decision strong {
+    color: var(--status-investigate);
+  }
+
+  .result-preview__decision p {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .result-preview__footer {
+    margin: var(--space-5) 0 0;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  @media (max-width: 800px) {
+    .result-preview__visual,
+    .result-preview__analysis {
+      grid-template-columns: 1fr;
+    }
+
+    .result-preview__decision {
+      grid-template-columns: 1fr;
+    }
+
+    .result-preview__top {
+      flex-direction: column;
+    }
+  }
+
 </style>
