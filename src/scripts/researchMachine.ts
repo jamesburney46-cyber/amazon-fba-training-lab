@@ -139,6 +139,7 @@ export function initResearchMachine(root: HTMLElement) {
   function renderCard(candidate: Candidate, stage: Stage): HTMLElement {
     const li = document.createElement("li");
     li.className = "board-card";
+    li.dataset.candidateId = candidate.id;
 
     const name = document.createElement("p");
     name.className = "board-card__name";
@@ -203,6 +204,22 @@ export function initResearchMachine(root: HTMLElement) {
     return li;
   }
 
+  function focusCandidate(candidateId: string, stage: Stage) {
+    requestAnimationFrame(() => {
+      const list = root.querySelector<HTMLElement>(`[data-stage-list="${stage}"]`);
+      const card = list?.querySelector<HTMLElement>(`[data-candidate-id="${candidateId}"]`);
+      const board = root.closest<HTMLElement>("#research-board") ?? root;
+
+      board.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      if (card) {
+        card.classList.add("board-card--highlight");
+        card.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+        window.setTimeout(() => card.classList.remove("board-card--highlight"), 1800);
+      }
+    });
+  }
+
   async function addCandidate(name: string) {
     if (live && supabase && userId) {
       const { data, error } = await supabase
@@ -220,6 +237,7 @@ export function initResearchMachine(root: HTMLElement) {
     }
     setBoardStatus(savedMessage());
     render();
+    focusCandidate(state.candidates[state.candidates.length - 1].id, "raw");
   }
 
   async function advanceCandidate(candidate: Candidate, upcoming: Stage) {
@@ -237,6 +255,7 @@ export function initResearchMachine(root: HTMLElement) {
     }
     setBoardStatus(savedMessage());
     render();
+    focusCandidate(candidate.id, upcoming);
   }
 
   async function rejectCandidate(candidate: Candidate) {
