@@ -4,6 +4,8 @@ import Card from "@/components/Card.astro";
 import Button from "@/components/Button.astro";
 import Badge from "@/components/Badge.astro";
 import Callout from "@/components/Callout.astro";
+import VideoThumb from "@/components/VideoThumb.astro";
+import { getWeekPreviewVideo } from "@/data/videos";
 import { url } from "@/lib/paths";
 
 const pillars = [
@@ -133,15 +135,25 @@ const funnel = [
         </Button>
       </div>
       <ol class="week-grid">
-        {weeks.map((w) => (
-          <li class:list={["week-tile", { "week-tile--planned": w.status === "planned" }]}>
-            <span class="week-tile__number">Week {w.n}</span>
-            <span class="week-tile__title">{w.title}</span>
-            <span class="week-tile__status">
-              {w.status === "live" ? "Available now" : "Planned"}
-            </span>
-          </li>
-        ))}
+        {weeks.map((w) => {
+          const previewVideo = getWeekPreviewVideo(w.n);
+          return (
+            <li class:list={["week-tile", { "week-tile--planned": w.status === "planned" }]}>
+              {previewVideo && (
+                <VideoThumb
+                  youtubeId={previewVideo.youtubeId}
+                  title={previewVideo.title}
+                  class="week-tile__thumb"
+                />
+              )}
+              <span class="week-tile__number">Week {w.n}</span>
+              <span class="week-tile__title">{w.title}</span>
+              <span class="week-tile__status">
+                {w.status === "live" ? "Available now" : "Planned"}
+              </span>
+            </li>
+          );
+        })}
       </ol>
     </div>
   </section>
@@ -382,6 +394,11 @@ const funnel = [
     border: 1px solid var(--border-default);
     background: var(--bg-surface);
   }
+  .week-tile__thumb {
+    width: 104px;
+    margin-bottom: var(--space-3);
+  }
+
   .week-tile__number {
     font-size: var(--text-xs);
     color: var(--accent-400);

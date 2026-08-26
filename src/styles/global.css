@@ -6,6 +6,17 @@
   box-sizing: border-box;
 }
 
+/* Authored `display` rules on many components (e.g. .btn { display: flex })
+   are author-origin CSS, which beats the browser's built-in
+   `[hidden] { display: none }` rule in the cascade regardless of source
+   order or selector specificity. Without this, toggling the `hidden`
+   attribute/prop (auth-state gating, mobile nav, etc.) stops working the
+   moment any component sets its own `display`. This makes `[hidden]`
+   authoritative everywhere on the site. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   background: var(--bg-canvas);
   color-scheme: dark;
