@@ -147,19 +147,6 @@ export const weeks: Week[] = [
           },
         ],
       },
-      {
-        night: 5,
-        title: "Week 1 exam",
-        steps: [
-          {
-            kind: "do",
-            heading: "Exam",
-            items: [
-              "Without notes, explain the entire FBA business on one page.",
-            ],
-          },
-        ],
-      },
     ],
     examPrompt: "Without notes, explain the entire FBA business on one page.",
     passStandard:
@@ -240,19 +227,6 @@ export const weeks: Week[] = [
             kind: "do",
             heading: "Do",
             items: ["Kill at least half the original 20 ideas using evidence."],
-          },
-        ],
-      },
-      {
-        night: 5,
-        title: "Week 2 exam",
-        steps: [
-          {
-            kind: "do",
-            heading: "Exam",
-            items: [
-              "Deliver five surviving product ideas, each with: why demand exists, key keyword, indicative price, competition warning, reason it survived, biggest unknown.",
-            ],
           },
         ],
       },
