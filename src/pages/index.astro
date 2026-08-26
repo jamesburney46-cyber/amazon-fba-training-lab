@@ -230,7 +230,7 @@ const funnel = [
     </div>
   </section>
 
-  <section class="section section--muted">
+  <section class="section section--muted evidence-section">
     <div class="container">
       <div class="section__head">
         <div>
@@ -262,6 +262,7 @@ const funnel = [
 
   <section class="section cta">
     <div class="container cta__inner">
+      <span class="cta__eyebrow">Put the discipline into practice</span>
       <h2>Ready to see whether an idea survives the evidence?</h2>
       <p class="section__lede">
         Create a free account to track your progress through the programme,
@@ -1087,6 +1088,237 @@ const funnel = [
         transparent 65%
       ),
       var(--bg-canvas);
+  }
+
+
+  /* Homepage lower-section refinement */
+
+  /* =====================================================
+     Product Research Machine
+     ===================================================== */
+
+  .funnel__stage {
+    position: relative;
+    overflow: hidden;
+    transition:
+      border-color 160ms ease,
+      background 160ms ease,
+      transform 160ms ease;
+  }
+
+  .funnel__stage::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--stage-accent, #60a5fa);
+    opacity: 0.8;
+  }
+
+  .funnel__stage:nth-child(1) {
+    --stage-accent: #60a5fa;
+  }
+
+  .funnel__stage:nth-child(2) {
+    --stage-accent: #34d399;
+  }
+
+  .funnel__stage:nth-child(3) {
+    --stage-accent: #a78bfa;
+  }
+
+  .funnel__stage:nth-child(4) {
+    --stage-accent: #60a5fa;
+  }
+
+  .funnel__stage:nth-child(5) {
+    --stage-accent: #f5b942;
+  }
+
+  .funnel__stage:hover {
+    transform: translateX(2px);
+    border-color: color-mix(
+      in srgb,
+      var(--stage-accent) 32%,
+      var(--border-default)
+    );
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--stage-accent) 6%, transparent),
+        transparent 35%
+      ),
+      var(--bg-surface);
+  }
+
+  .funnel__count {
+    color: var(--text-primary);
+    font-weight: var(--weight-semibold);
+  }
+
+
+  /* =====================================================
+     Evidence section
+     ===================================================== */
+
+  .evidence-section {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        40% 80% at 0% 0%,
+        rgba(96, 165, 250, 0.055),
+        transparent 70%
+      ),
+      radial-gradient(
+        35% 70% at 100% 100%,
+        rgba(167, 139, 250, 0.04),
+        transparent 70%
+      ),
+      var(--bg-inset);
+  }
+
+  .evidence-section .badge-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 48px;
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    transition:
+      background 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .evidence-section .badge-row:nth-of-type(1) {
+    background: rgba(96, 165, 250, 0.035);
+  }
+
+  .evidence-section .badge-row:nth-of-type(1):hover {
+    border-color: rgba(96, 165, 250, 0.18);
+    background: rgba(96, 165, 250, 0.06);
+  }
+
+  .evidence-section .badge-row:nth-of-type(2) {
+    background: rgba(167, 139, 250, 0.035);
+  }
+
+  .evidence-section .badge-row:nth-of-type(2):hover {
+    border-color: rgba(167, 139, 250, 0.18);
+    background: rgba(167, 139, 250, 0.06);
+  }
+
+  .evidence-section .badge-row:nth-of-type(3) {
+    background: rgba(148, 163, 184, 0.025);
+  }
+
+  .evidence-section .badge-row:nth-of-type(3):hover {
+    border-color: rgba(148, 163, 184, 0.14);
+    background: rgba(148, 163, 184, 0.045);
+  }
+
+
+  /* =====================================================
+     Closing CTA
+     ===================================================== */
+
+  .cta {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 7vw, 6rem);
+    border-top: 1px solid var(--border-subtle);
+    background:
+      radial-gradient(
+        52% 95% at 50% 100%,
+        rgba(59, 130, 246, 0.12),
+        transparent 68%
+      ),
+      radial-gradient(
+        30% 60% at 78% 60%,
+        rgba(167, 139, 250, 0.055),
+        transparent 72%
+      ),
+      var(--bg-canvas);
+  }
+
+  .cta::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: min(720px, 70%);
+    height: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #60a5fa,
+      #34d399,
+      #a78bfa,
+      #f5b942,
+      transparent
+    );
+    opacity: 0.55;
+  }
+
+  .cta__inner {
+    position: relative;
+    max-width: 760px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .cta__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin: 0 auto var(--space-3);
+    padding: 6px 11px;
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    border-radius: 999px;
+    background: rgba(96, 165, 250, 0.075);
+    color: #93b9ff;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .cta__inner h2 {
+    max-width: 18ch;
+    margin-inline: auto;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.025em;
+  }
+
+  .cta__inner .section__lede {
+    max-width: 60ch;
+    margin-inline: auto;
+  }
+
+  .cta__inner .hero__actions {
+    justify-content: center;
+    margin-top: var(--space-6);
+  }
+
+  .cta__inner .hero__actions a:first-child {
+    box-shadow:
+      0 10px 30px rgba(59, 130, 246, 0.2),
+      0 0 45px rgba(59, 130, 246, 0.06);
+  }
+
+  @media (max-width: 700px) {
+    .evidence-section .badge-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .cta {
+      padding-block: var(--space-12);
+    }
   }
 
 </style>
