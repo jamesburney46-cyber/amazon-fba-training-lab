@@ -5,7 +5,6 @@ import Callout from "@/components/Callout.astro";
 import CheckpointBox from "@/components/CheckpointBox.astro";
 import ExamBox from "@/components/ExamBox.astro";
 import VideoEmbed from "@/components/VideoEmbed.astro";
-import VideoThumb from "@/components/VideoThumb.astro";
 import { weeks, type LessonStep, type Week } from "@/data/curriculum";
 import { getLessonVideos } from "@/data/videos";
 import { url } from "@/lib/paths";
@@ -49,20 +48,12 @@ const stepLabel: Record<LessonStep["kind"], string> = {
   ) : (
     <div class="lessons">
       {week.lessons?.map((lesson) => {
-        const previewVideo = getLessonVideos(week.n, lesson.night)[0];
         return (
         <div id={`night-${lesson.night}`} class="lesson-anchor">
         <Card class="lesson">
           <div class="lesson__head">
             <span class="lesson__night">Night {lesson.night}</span>
             <h2>{lesson.title}</h2>
-            {previewVideo && (
-              <VideoThumb
-                youtubeId={previewVideo.youtubeId}
-                title={previewVideo.title}
-                class="lesson__thumb"
-              />
-            )}
           </div>
           <div class="lesson__steps">
             {lesson.steps.map((step) =>
@@ -167,10 +158,6 @@ const stepLabel: Record<LessonStep["kind"], string> = {
     flex-wrap: wrap;
     gap: var(--space-3);
     margin-bottom: var(--space-4);
-  }
-  .lesson__thumb {
-    width: 88px;
-    margin-left: auto;
   }
   .lesson__night {
     font-size: var(--text-xs);
