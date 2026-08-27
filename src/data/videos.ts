@@ -19,7 +19,7 @@
 // One primary embedded video per instructional night. Week 1/2 Night 5 are
 // exam nights and intentionally carry no compulsory video.
 
-export type VideoSource = "official" | "third-party";
+export type VideoSource = "official" | "govuk" | "third-party";
 
 export type LessonVideo = {
   youtubeId: string;
@@ -128,6 +128,22 @@ export const lessonVideos: LessonVideo[] = [
     night: 1,
   },
   {
+    youtubeId: "8wfFXYR0EHI",
+    title: "Travis Marziani — Amazon FBA Fees Explained",
+    source: "third-party",
+    note: "The detailed fees walkthrough from Week 1 is reused deliberately here: Night 2 now applies its referral, fulfilment, storage, returns and prep cost lines to a complete product P&L rather than viewing fees in isolation.",
+    week: 4,
+    night: 2,
+  },
+  {
+    youtubeId: "SCVrD6gUW34",
+    title: "Amazon Ads Break-even ACoS Calculation Tutorial 2025",
+    source: "third-party",
+    note: "Focused walkthrough of profit margin and break-even ACoS for Night 3's break-even CPA, break-even ACoS and target ACoS calculations. Cross-check definitions against the linked official Amazon Ads guidance.",
+    week: 4,
+    night: 3,
+  },
+  {
     youtubeId: "AIBICWv862s",
     title: "How to find a Supplier in China and on Alibaba for your Amazon FBA Store (with Kian Golzari)",
     source: "third-party",
@@ -149,6 +165,22 @@ export const lessonVideos: LessonVideo[] = [
     source: "third-party",
     note: "Negotiation walkthrough covering price, MOQ and payment-term tactics for Night 3's negotiation exercise.",
     week: 5,
+    night: 3,
+  },
+  {
+    youtubeId: "RqmA9S0w9-Y",
+    title: "HMRC — Customs clearance instructions for imports: how to identify the commodity code",
+    source: "govuk",
+    note: "HMRC's short, worked introduction to finding an import commodity code in the UK tariff for Night 2. The learner must still verify the case product in the live GOV.UK Trade Tariff rather than copying the example code.",
+    week: 6,
+    night: 2,
+  },
+  {
+    youtubeId: "smJ9iztUMVc",
+    title: "HMRC — Importing parcels into Great Britain from other countries",
+    source: "govuk",
+    note: "Official overview covering EORI, import declarations, customs duty, import VAT and preference claims. Use the relevant chapters for Night 3, then rely on the linked GOV.UK pages for the current rules and calculation exercise.",
+    week: 6,
     night: 3,
   },
 ];

@@ -455,7 +455,7 @@ export const weeks: Week[] = [
             kind: "watch",
             heading: "Watch / read",
             items: [
-              "Re-read Amazon's own fee guidance (referral, FBA, storage) covered in Week 1, Night 3.",
+              "Rewatch the detailed fees walkthrough from Week 1, Night 3, then re-read Amazon's own current fee guidance (referral, FBA and storage).",
               "Skim a landed-cost / product-profitability breakdown so you know every line item a full P&L should include.",
             ],
           },
@@ -491,6 +491,7 @@ export const weeks: Week[] = [
             kind: "watch",
             heading: "Watch / read",
             items: [
+              "Watch the focused break-even ACoS calculation walkthrough, then use Amazon Ads' definitions as the factual reference.",
               "Read Amazon Ads' Sponsored Products best-practices guide for how ACoS and cost-per-order are defined and used.",
             ],
           },
@@ -767,8 +768,9 @@ export const weeks: Week[] = [
         steps: [
           {
             kind: "watch",
-            heading: "Read",
+            heading: "Watch / use",
             items: [
+              "Watch HMRC's short worked introduction to identifying a commodity code.",
               "Use GOV.UK's Trade Tariff tool to look up the commodity code and duty rate for your candidate product.",
             ],
           },
@@ -803,8 +805,9 @@ export const weeks: Week[] = [
         steps: [
           {
             kind: "watch",
-            heading: "Read",
+            heading: "Watch / read",
             items: [
+              "Watch the relevant chapters of HMRC's importing overview covering EORI, customs duty and import VAT.",
               "Read GOV.UK's guidance on paying VAT and duties on imports, and on VAT on imports, acquisitions and purchases from abroad.",
               "Read GOV.UK's guidance on getting an EORI number.",
             ],

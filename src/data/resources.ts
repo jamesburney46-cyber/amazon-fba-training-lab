@@ -122,6 +122,13 @@ export const resources: Resource[] = [
     note: "Week 4, Night 1 core video — stress-testing a candidate's unit economics before committing.",
   },
   {
+    title: "Amazon Ads Break-even ACoS Calculation Tutorial 2025",
+    href: "https://www.youtube.com/watch?v=SCVrD6gUW34",
+    source: "third-party",
+    category: "PPC",
+    note: "Week 4, Night 3 walkthrough — calculate break-even ACoS from the candidate's own economics, then cross-check terminology against official Amazon Ads guidance.",
+  },
+  {
     title: "How to find a Supplier in China and on Alibaba for your Amazon FBA Store (with Kian Golzari)",
     href: "https://www.youtube.com/watch?v=AIBICWv862s",
     source: "third-party",
@@ -155,6 +162,20 @@ export const resources: Resource[] = [
     source: "govuk",
     category: "UK import / customs / VAT / IP",
     note: "Authoritative UK government process reference.",
+  },
+  {
+    title: "HMRC — how to identify an import commodity code",
+    href: "https://www.youtube.com/watch?v=RqmA9S0w9-Y",
+    source: "govuk",
+    category: "UK import / customs / VAT / IP",
+    note: "Week 6, Night 2 official worked introduction; verify the fictional product against the live UK Trade Tariff.",
+  },
+  {
+    title: "HMRC — importing parcels into Great Britain",
+    href: "https://www.youtube.com/watch?v=smJ9iztUMVc",
+    source: "govuk",
+    category: "UK import / customs / VAT / IP",
+    note: "Week 6, Night 3 official overview covering EORI, customs duty, import VAT and preference claims; current GOV.UK guidance remains authoritative.",
   },
   {
     title: "UK Trade Tariff / commodity-code lookup",
