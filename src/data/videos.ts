@@ -11,7 +11,7 @@
 // curated in Issue #30 "Week 1–2 missing-video curation — 24 Aug 2026"
 // (comment 5402399452).
 //
-// Weeks 1–3 carry nightly content and curated embedded videos where a
+// Weeks 1–7 carry nightly content and curated embedded videos where a
 // useful genuine YouTube source exists. Some nights intentionally use
 // authoritative reading/manual exercises instead of forcing a weak video.
 // Do not fabricate thumbnails or video IDs for future weeks.
@@ -118,6 +118,38 @@ export const lessonVideos: LessonVideo[] = [
     note: "Validation workshop reused for Week 3 Night 4 to stress-test whether proposed differentiation genuinely improves the investment case or whether the product should be rejected.",
     week: 3,
     night: 4,
+  },
+  {
+    youtubeId: "Q-mh2ydQ0Z0",
+    title: "Million Dollar Case Study — Final Product Selection / Amazon FBA Profitability",
+    source: "third-party",
+    note: "Walks through stress-testing a candidate's unit economics before committing — the Night 1 core video for building the unit-economics worksheet.",
+    week: 4,
+    night: 1,
+  },
+  {
+    youtubeId: "AIBICWv862s",
+    title: "How to find a Supplier in China and on Alibaba for your Amazon FBA Store (with Kian Golzari)",
+    source: "third-party",
+    note: "Sourcing-expert walkthrough of finding and vetting suppliers in China and on Alibaba for Night 1's supplier-screening exercise.",
+    week: 5,
+    night: 1,
+  },
+  {
+    youtubeId: "H5nda2CpzPg",
+    title: "How to Order Samples From an Alibaba Supplier To Start Amazon FBA",
+    source: "third-party",
+    note: "Practical walkthrough of ordering paid samples from a shortlisted supplier before committing to production, for Night 2's sample-evaluation exercise.",
+    week: 5,
+    night: 2,
+  },
+  {
+    youtubeId: "IlJtL7H0nrI",
+    title: "How To Negotiate With Suppliers On Alibaba (Amazon FBA)",
+    source: "third-party",
+    note: "Negotiation walkthrough covering price, MOQ and payment-term tactics for Night 3's negotiation exercise.",
+    week: 5,
+    night: 3,
   },
 ];
 

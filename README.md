@@ -25,9 +25,9 @@ never executes supplier, payment or funding actions.
 - Learner dashboard: course progress, current week, next lesson, recent
   work. **Not** a live sales/profit/PPC KPI dashboard.
 - Responsive navigation (desktop nav + accessible mobile menu).
-- Fully built **Week 1** and **Week 2** lesson experiences, each preserving
-  Watch → Do → Explain Back → Checkpoint. Weeks 3–12 show their goal only —
-  deliberately not populated in this phase.
+- Fully built **Weeks 1–7** lesson experiences, each preserving Watch → Do →
+  Explain Back → Checkpoint. Weeks 8–12 show their goal only and remain
+  deliberately unpopulated until their evidence-led content is built.
 - Sample resource library, every entry tagged Official Amazon / GOV.UK /
   Third-party.
 - Interactive **Product Research Machine**: a practice board for the

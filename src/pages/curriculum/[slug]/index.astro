@@ -40,13 +40,22 @@ const stepLabel: Record<LessonStep["kind"], string> = {
     <Callout tone="info" title="This week is planned, not yet built">
       <p>
         Week {week.n} will follow the same Watch → Do → Explain Back →
-        Checkpoint structure as Weeks 1–2 once it opens. No nightly content
-        has been invented for it in this phase — check back after it's
-        built, or revisit Weeks 1–2 in the meantime.
+        Checkpoint structure as the live weeks once it opens. No nightly
+        content has been invented for it yet — check back after it's built,
+        or revisit an earlier live week in the meantime.
       </p>
     </Callout>
   ) : (
     <div class="lessons">
+      <Callout tone="info" title="Fictional local simulation only">
+        <p>
+          Every exercise, checkpoint and exam on this page is a training
+          simulation. Use fictional case data and save work locally. Do not
+          contact suppliers or other people, buy samples, request quotes,
+          place orders, send payments, create shipments, or change Amazon,
+          advertising, tax, customs or other external accounts.
+        </p>
+      </Callout>
       {week.lessons?.map((lesson) => {
         return (
         <div id={`night-${lesson.night}`} class="lesson-anchor">

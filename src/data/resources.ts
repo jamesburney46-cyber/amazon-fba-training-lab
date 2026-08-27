@@ -3,6 +3,7 @@
 export type ResourceCategory =
   | "FBA fundamentals"
   | "Product research"
+  | "Suppliers and sourcing"
   | "PPC"
   | "UK import / customs / VAT / IP";
 
@@ -79,6 +80,20 @@ export const resources: Resource[] = [
     note: "Official best-practice guidance for PPC structure.",
   },
   {
+    title: "Amazon Ads — improve your products for advertising",
+    href: "https://advertising.amazon.com/library/guides/improve-your-products-for-advertising",
+    source: "official",
+    category: "FBA fundamentals",
+    note: "Week 7 core reading — official guidance for titles, images, bullets, descriptions and detail-page readiness before paid traffic.",
+  },
+  {
+    title: "Amazon Ads — measure and improve campaigns",
+    href: "https://advertising.amazon.com/library/guides/measure-improve-campaigns",
+    source: "official",
+    category: "PPC",
+    note: "Week 7, Night 4 reading — high clicks with few orders can indicate a product-detail-page problem, not merely a bid problem.",
+  },
+  {
     title: "Amazon product-research framework (2026)",
     href: "https://www.junglescout.com/resources/articles/amazon-product-research-framework-for-launching-products/",
     source: "third-party",
@@ -98,6 +113,41 @@ export const resources: Resource[] = [
     source: "third-party",
     category: "Product research",
     note: "Week 2, Night 3 core video — current walkthrough of the research tools.",
+  },
+  {
+    title: "Million Dollar Case Study — Final Product Selection / Amazon FBA Profitability",
+    href: "https://www.youtube.com/watch?v=Q-mh2ydQ0Z0",
+    source: "third-party",
+    category: "FBA fundamentals",
+    note: "Week 4, Night 1 core video — stress-testing a candidate's unit economics before committing.",
+  },
+  {
+    title: "How to find a Supplier in China and on Alibaba for your Amazon FBA Store (with Kian Golzari)",
+    href: "https://www.youtube.com/watch?v=AIBICWv862s",
+    source: "third-party",
+    category: "Suppliers and sourcing",
+    note: "Week 5, Night 1 core video — finding and vetting suppliers beyond Alibaba badges alone.",
+  },
+  {
+    title: "How to Order Samples From an Alibaba Supplier To Start Amazon FBA",
+    href: "https://www.youtube.com/watch?v=H5nda2CpzPg",
+    source: "third-party",
+    category: "Suppliers and sourcing",
+    note: "Week 5, Night 2 core video — ordering and judging paid samples before committing to production.",
+  },
+  {
+    title: "How To Negotiate With Suppliers On Alibaba (Amazon FBA)",
+    href: "https://www.youtube.com/watch?v=IlJtL7H0nrI",
+    source: "third-party",
+    category: "Suppliers and sourcing",
+    note: "Week 5, Night 3 core video — negotiating price, MOQ and payment terms, not price alone.",
+  },
+  {
+    title: "Placing UKCA or CE marked products on the market in Great Britain",
+    href: "https://www.gov.uk/guidance/placing-ukca-or-ce-marked-products-on-the-market-in-great-britain",
+    source: "govuk",
+    category: "UK import / customs / VAT / IP",
+    note: "Week 5, Night 4 reading — the importer's own legal responsibility for product safety and marking, used to test supplier compliance documentation.",
   },
   {
     title: "Import goods into the UK — step by step",
